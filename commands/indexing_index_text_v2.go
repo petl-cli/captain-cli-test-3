@@ -21,6 +21,8 @@ var indexingIndexTextV2Flags struct {
 	xOrganizationId string
 	collectionName  string
 	idempotencyKey  string
+	content         string
+	filename        string
 	body            string
 }
 
@@ -30,7 +32,11 @@ func init() {
 	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexTextV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
-	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.content, "content", "", "The text content to index.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.filename, "filename", "", "Optional filename for the text document. Defaults to 'snippet-{N}.txt' where N auto-increments.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexTextV2Cmd)
 }
@@ -66,6 +72,27 @@ func runIndexingIndexTextV2(cmd *cobra.Command, args []string) error {
 			Required:    false,
 			Location:    "header",
 			Description: "UUID for request deduplication",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "content",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "The text content to index.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "filename",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "Optional filename for the text document. Defaults to 'snippet-{N}.txt' where N auto-increments.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "custom-metadata",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Custom metadata to attach to all indexed chunks. Keys must be strings. Values: str, int, float, bool, or array of strings.",
 		})
 
 		type responseSchema struct {
@@ -159,6 +186,13 @@ func runIndexingIndexTextV2(cmd *cobra.Command, args []string) error {
 			cliErr.Write(os.Stderr)
 			return output.NewExitError(cliErr)
 		}
+	}
+	// Individual flags overlay onto body (flags take precedence over --body JSON)
+	if cmd.Flags().Changed("content") {
+		bodyMap["content"] = indexingIndexTextV2Flags.content
+	}
+	if cmd.Flags().Changed("filename") {
+		bodyMap["filename"] = indexingIndexTextV2Flags.filename
 	}
 	req.Body = bodyMap
 

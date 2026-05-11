@@ -21,6 +21,10 @@ var indexingIndexUrlV2Flags struct {
 	xOrganizationId string
 	collectionName  string
 	idempotencyKey  string
+	url             string
+	urls            []string
+	processingType  string
+	parsingScript   string
 	body            string
 }
 
@@ -30,7 +34,15 @@ func init() {
 	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexUrlV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
-	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.url, "url", "", "A single public URL to a document or web page. Hosted files (PDF, DOCX, etc.) are indexed directly. Web pages (HTML) are automatically scraped  -  text and images are extracted. Provide either 'url' or 'urls', not both.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexUrlV2Cmd.Flags().StringSliceVar(&indexingIndexUrlV2Flags.urls, "urls", nil, "An array of public URLs to documents or web pages. Each URL is auto-detected  -  hosted files are indexed directly, web pages are scraped. Provide either 'url' or 'urls', not both.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.processingType, "processing-type", "", "Processing mode. For hosted documents: 'advanced' enables AI-enhanced extraction for complex layouts, tables, figures, and charts; 'basic' provides standard document processing. For web pages: 'advanced' extracts both text content and page images; 'basic' extracts text content only (faster, lower cost).")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexUrlV2Cmd)
 }
@@ -66,6 +78,41 @@ func runIndexingIndexUrlV2(cmd *cobra.Command, args []string) error {
 			Required:    false,
 			Location:    "header",
 			Description: "UUID for request deduplication",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "url",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "A single public URL to a document or web page. Hosted files (PDF, DOCX, etc.) are indexed directly. Web pages (HTML) are automatically scraped  -  text and images are extracted. Provide either 'url' or 'urls', not both.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "urls",
+			Type:        "array",
+			Required:    false,
+			Location:    "body",
+			Description: "An array of public URLs to documents or web pages. Each URL is auto-detected  -  hosted files are indexed directly, web pages are scraped. Provide either 'url' or 'urls', not both.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "processing-type",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Processing mode. For hosted documents: 'advanced' enables AI-enhanced extraction for complex layouts, tables, figures, and charts; 'basic' provides standard document processing. For web pages: 'advanced' extracts both text content and page images; 'basic' extracts text content only (faster, lower cost).",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "custom-metadata",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Custom metadata to attach to all indexed chunks. Keys must be strings. Values: str, int, float, bool, or array of strings.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "parsing-script",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.",
 		})
 
 		type responseSchema struct {
@@ -159,6 +206,19 @@ func runIndexingIndexUrlV2(cmd *cobra.Command, args []string) error {
 			cliErr.Write(os.Stderr)
 			return output.NewExitError(cliErr)
 		}
+	}
+	// Individual flags overlay onto body (flags take precedence over --body JSON)
+	if cmd.Flags().Changed("url") {
+		bodyMap["url"] = indexingIndexUrlV2Flags.url
+	}
+	if cmd.Flags().Changed("urls") {
+		bodyMap["urls"] = indexingIndexUrlV2Flags.urls
+	}
+	if cmd.Flags().Changed("processing-type") {
+		bodyMap["processing_type"] = indexingIndexUrlV2Flags.processingType
+	}
+	if cmd.Flags().Changed("parsing-script") {
+		bodyMap["parsing_script"] = indexingIndexUrlV2Flags.parsingScript
 	}
 	req.Body = bodyMap
 

@@ -18,10 +18,18 @@ var indexingIndexS3BucketV2Cmd = &cobra.Command{
 }
 
 var indexingIndexS3BucketV2Flags struct {
-	xOrganizationId string
-	collectionName  string
-	idempotencyKey  string
-	body            string
+	xOrganizationId    string
+	collectionName     string
+	idempotencyKey     string
+	bucketName         string
+	bucketRegion       string
+	awsAccessKeyId     string
+	awsSecretAccessKey string
+	processingType     string
+	maxFiles           int
+	skipExisting       bool
+	parsingScript      string
+	body               string
 }
 
 func init() {
@@ -30,7 +38,23 @@ func init() {
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexS3BucketV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
-	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.bucketName, "bucket-name", "", "Name of the S3 bucket")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.bucketRegion, "bucket-region", "", "AWS region where the bucket is located")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.awsAccessKeyId, "aws-access-key-id", "", "AWS access key ID with read access to the bucket. Use this for long-lived IAM-user credentials. Omit when using the role-based 'auth' block.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.awsSecretAccessKey, "aws-secret-access-key", "", "AWS secret access key. Use this for long-lived IAM-user credentials. Omit when using the role-based 'auth' block.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexS3BucketV2Cmd.Flags().IntVar(&indexingIndexS3BucketV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexS3BucketV2Cmd.Flags().BoolVar(&indexingIndexS3BucketV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexS3BucketV2Cmd)
 }
@@ -66,6 +90,76 @@ func runIndexingIndexS3BucketV2(cmd *cobra.Command, args []string) error {
 			Required:    false,
 			Location:    "header",
 			Description: "UUID for request deduplication",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "bucket-name",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Name of the S3 bucket",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "bucket-region",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "AWS region where the bucket is located",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "aws-access-key-id",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "AWS access key ID with read access to the bucket. Use this for long-lived IAM-user credentials. Omit when using the role-based 'auth' block.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "aws-secret-access-key",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "AWS secret access key. Use this for long-lived IAM-user credentials. Omit when using the role-based 'auth' block.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "auth",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Cross-account role-assumption auth for S3 indexing. Captain calls sts:AssumeRole on the supplied role_arn (with the supplied external_id) instead of using static IAM-user keys, so no long-lived secrets cross the boundary.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "processing-type",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "max-files",
+			Type:        "integer",
+			Required:    false,
+			Location:    "body",
+			Description: "Maximum number of files to index (optional)",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "skip-existing",
+			Type:        "boolean",
+			Required:    false,
+			Location:    "body",
+			Description: "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "custom-metadata",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Custom metadata to attach to all indexed chunks. Keys must be strings. Values: str, int, float, bool, or array of strings.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "parsing-script",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.",
 		})
 
 		type responseSchema struct {
@@ -159,6 +253,31 @@ func runIndexingIndexS3BucketV2(cmd *cobra.Command, args []string) error {
 			cliErr.Write(os.Stderr)
 			return output.NewExitError(cliErr)
 		}
+	}
+	// Individual flags overlay onto body (flags take precedence over --body JSON)
+	if cmd.Flags().Changed("bucket-name") {
+		bodyMap["bucket_name"] = indexingIndexS3BucketV2Flags.bucketName
+	}
+	if cmd.Flags().Changed("bucket-region") {
+		bodyMap["bucket_region"] = indexingIndexS3BucketV2Flags.bucketRegion
+	}
+	if cmd.Flags().Changed("aws-access-key-id") {
+		bodyMap["aws_access_key_id"] = indexingIndexS3BucketV2Flags.awsAccessKeyId
+	}
+	if cmd.Flags().Changed("aws-secret-access-key") {
+		bodyMap["aws_secret_access_key"] = indexingIndexS3BucketV2Flags.awsSecretAccessKey
+	}
+	if cmd.Flags().Changed("processing-type") {
+		bodyMap["processing_type"] = indexingIndexS3BucketV2Flags.processingType
+	}
+	if cmd.Flags().Changed("max-files") {
+		bodyMap["max_files"] = indexingIndexS3BucketV2Flags.maxFiles
+	}
+	if cmd.Flags().Changed("skip-existing") {
+		bodyMap["skip_existing"] = indexingIndexS3BucketV2Flags.skipExisting
+	}
+	if cmd.Flags().Changed("parsing-script") {
+		bodyMap["parsing_script"] = indexingIndexS3BucketV2Flags.parsingScript
 	}
 	req.Body = bodyMap
 

@@ -31,7 +31,7 @@ func init() {
 	indexingValidateParsingScriptV2Cmd.MarkFlagRequired("authorization")
 	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.file, "file", "", "The .js parsing script file to validate. Max 1 MB.")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
-	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingValidateParsingScriptV2Cmd)
 }
@@ -64,7 +64,7 @@ func runIndexingValidateParsingScriptV2(cmd *cobra.Command, args []string) error
 		flags = append(flags, flagSchema{
 			Name:        "file",
 			Type:        "string",
-			Required:    false,
+			Required:    true,
 			Location:    "body",
 			Description: "The .js parsing script file to validate. Max 1 MB.",
 		})

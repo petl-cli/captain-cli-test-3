@@ -20,6 +20,12 @@ var indexingIndexAzureFileV2Cmd = &cobra.Command{
 var indexingIndexAzureFileV2Flags struct {
 	xOrganizationId string
 	collectionName  string
+	containerName   string
+	fileUri         string
+	accountName     string
+	accountKey      string
+	processingType  string
+	parsingScript   string
 	body            string
 }
 
@@ -28,7 +34,19 @@ func init() {
 	indexingIndexAzureFileV2Cmd.MarkFlagRequired("x-organization-id")
 	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexAzureFileV2Cmd.MarkFlagRequired("collection-name")
-	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.containerName, "container-name", "", "Name of the Azure Blob Storage container")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.fileUri, "file-uri", "", "Azure Blob Storage URI format: https://{account}.blob.core.windows.net/{container}/path/to/file.pdf")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.accountName, "account-name", "", "Azure Storage account name")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.accountKey, "account-key", "", "Azure Storage account key (base64-encoded)")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexAzureFileV2Cmd.Flags().StringVar(&indexingIndexAzureFileV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexAzureFileV2Cmd)
 }
@@ -57,6 +75,55 @@ func runIndexingIndexAzureFileV2(cmd *cobra.Command, args []string) error {
 			Required:    true,
 			Location:    "path",
 			Description: "Name of the collection to index into",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "container-name",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Name of the Azure Blob Storage container",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "file-uri",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Azure Blob Storage URI format: https://{account}.blob.core.windows.net/{container}/path/to/file.pdf",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "account-name",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Azure Storage account name",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "account-key",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Azure Storage account key (base64-encoded)",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "processing-type",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "custom-metadata",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Custom metadata to attach to all chunks from this file. Keys must be strings. Values: str, int, float, bool, or array of strings.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "parsing-script",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.",
 		})
 
 		type responseSchema struct {
@@ -147,6 +214,25 @@ func runIndexingIndexAzureFileV2(cmd *cobra.Command, args []string) error {
 			cliErr.Write(os.Stderr)
 			return output.NewExitError(cliErr)
 		}
+	}
+	// Individual flags overlay onto body (flags take precedence over --body JSON)
+	if cmd.Flags().Changed("container-name") {
+		bodyMap["container_name"] = indexingIndexAzureFileV2Flags.containerName
+	}
+	if cmd.Flags().Changed("file-uri") {
+		bodyMap["file_uri"] = indexingIndexAzureFileV2Flags.fileUri
+	}
+	if cmd.Flags().Changed("account-name") {
+		bodyMap["account_name"] = indexingIndexAzureFileV2Flags.accountName
+	}
+	if cmd.Flags().Changed("account-key") {
+		bodyMap["account_key"] = indexingIndexAzureFileV2Flags.accountKey
+	}
+	if cmd.Flags().Changed("processing-type") {
+		bodyMap["processing_type"] = indexingIndexAzureFileV2Flags.processingType
+	}
+	if cmd.Flags().Changed("parsing-script") {
+		bodyMap["parsing_script"] = indexingIndexAzureFileV2Flags.parsingScript
 	}
 	req.Body = bodyMap
 

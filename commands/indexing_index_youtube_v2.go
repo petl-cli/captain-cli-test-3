@@ -21,6 +21,9 @@ var indexingIndexYoutubeV2Flags struct {
 	xOrganizationId string
 	collectionName  string
 	idempotencyKey  string
+	url             string
+	urls            []string
+	languages       []string
 	body            string
 }
 
@@ -30,7 +33,13 @@ func init() {
 	indexingIndexYoutubeV2Cmd.Flags().StringVar(&indexingIndexYoutubeV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexYoutubeV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexYoutubeV2Cmd.Flags().StringVar(&indexingIndexYoutubeV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
-	indexingIndexYoutubeV2Cmd.Flags().StringVar(&indexingIndexYoutubeV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexYoutubeV2Cmd.Flags().StringVar(&indexingIndexYoutubeV2Flags.url, "url", "", "A single YouTube video URL. Supported formats: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/. Provide either 'url' or 'urls', not both.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexYoutubeV2Cmd.Flags().StringSliceVar(&indexingIndexYoutubeV2Flags.urls, "urls", nil, "An array of YouTube video URLs to index (max 20). Provide either 'url' or 'urls', not both.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexYoutubeV2Cmd.Flags().StringSliceVar(&indexingIndexYoutubeV2Flags.languages, "languages", nil, "Preferred transcript languages in priority order (ISO 639-1 codes). Defaults to English. Only specify if you need a non-English transcript (e.g., ['fr', 'de']). Falls back to auto-generated captions if manual transcript unavailable.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexYoutubeV2Cmd.Flags().StringVar(&indexingIndexYoutubeV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexYoutubeV2Cmd)
 }
@@ -66,6 +75,34 @@ func runIndexingIndexYoutubeV2(cmd *cobra.Command, args []string) error {
 			Required:    false,
 			Location:    "header",
 			Description: "UUID for request deduplication",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "url",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "A single YouTube video URL. Supported formats: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/. Provide either 'url' or 'urls', not both.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "urls",
+			Type:        "array",
+			Required:    false,
+			Location:    "body",
+			Description: "An array of YouTube video URLs to index (max 20). Provide either 'url' or 'urls', not both.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "languages",
+			Type:        "array",
+			Required:    false,
+			Location:    "body",
+			Description: "Preferred transcript languages in priority order (ISO 639-1 codes). Defaults to English. Only specify if you need a non-English transcript (e.g., ['fr', 'de']). Falls back to auto-generated captions if manual transcript unavailable.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "custom-metadata",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Custom metadata to attach to all indexed chunks. Keys must be strings. Values: str, int, float, bool, or array of strings.",
 		})
 
 		type responseSchema struct {
@@ -159,6 +196,16 @@ func runIndexingIndexYoutubeV2(cmd *cobra.Command, args []string) error {
 			cliErr.Write(os.Stderr)
 			return output.NewExitError(cliErr)
 		}
+	}
+	// Individual flags overlay onto body (flags take precedence over --body JSON)
+	if cmd.Flags().Changed("url") {
+		bodyMap["url"] = indexingIndexYoutubeV2Flags.url
+	}
+	if cmd.Flags().Changed("urls") {
+		bodyMap["urls"] = indexingIndexYoutubeV2Flags.urls
+	}
+	if cmd.Flags().Changed("languages") {
+		bodyMap["languages"] = indexingIndexYoutubeV2Flags.languages
 	}
 	req.Body = bodyMap
 

@@ -39,7 +39,7 @@ func init() {
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
 	indexingIndexFileV2Cmd.Flags().StringVar(&indexingIndexFileV2Flags.customMetadata, "custom-metadata", "", "JSON string of custom metadata to attach to all indexed chunks")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
-	indexingIndexFileV2Cmd.Flags().StringVar(&indexingIndexFileV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexFileV2Cmd.Flags().StringVar(&indexingIndexFileV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexFileV2Cmd)
 }
@@ -79,7 +79,7 @@ func runIndexingIndexFileV2(cmd *cobra.Command, args []string) error {
 		flags = append(flags, flagSchema{
 			Name:        "files",
 			Type:        "array",
-			Required:    false,
+			Required:    true,
 			Location:    "body",
 			Description: "One or more files to upload and index (max 20)",
 		})

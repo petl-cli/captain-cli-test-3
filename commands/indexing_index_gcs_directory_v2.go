@@ -18,10 +18,17 @@ var indexingIndexGcsDirectoryV2Cmd = &cobra.Command{
 }
 
 var indexingIndexGcsDirectoryV2Flags struct {
-	xOrganizationId string
-	collectionName  string
-	idempotencyKey  string
-	body            string
+	xOrganizationId    string
+	collectionName     string
+	idempotencyKey     string
+	bucketName         string
+	directoryPath      string
+	serviceAccountJson string
+	processingType     string
+	maxFiles           int
+	skipExisting       bool
+	parsingScript      string
+	body               string
 }
 
 func init() {
@@ -30,7 +37,21 @@ func init() {
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexGcsDirectoryV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
-	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.bucketName, "bucket-name", "", "Name of the GCS bucket")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.directoryPath, "directory-path", "", "Path to the directory within the bucket. Accepts either a relative path (e.g., 'reports/2024/january') or a full GCS URI (e.g., 'gs://my-bucket/reports/2024/january'). All files within this directory and its subdirectories will be indexed.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.serviceAccountJson, "service-account-json", "", "GCP service account JSON key with read access to the bucket")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsDirectoryV2Cmd.Flags().IntVar(&indexingIndexGcsDirectoryV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsDirectoryV2Cmd.Flags().BoolVar(&indexingIndexGcsDirectoryV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexGcsDirectoryV2Cmd)
 }
@@ -66,6 +87,62 @@ func runIndexingIndexGcsDirectoryV2(cmd *cobra.Command, args []string) error {
 			Required:    false,
 			Location:    "header",
 			Description: "UUID for request deduplication",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "bucket-name",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Name of the GCS bucket",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "directory-path",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Path to the directory within the bucket. Accepts either a relative path (e.g., 'reports/2024/january') or a full GCS URI (e.g., 'gs://my-bucket/reports/2024/january'). All files within this directory and its subdirectories will be indexed.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "service-account-json",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "GCP service account JSON key with read access to the bucket",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "processing-type",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "max-files",
+			Type:        "integer",
+			Required:    false,
+			Location:    "body",
+			Description: "Maximum number of files to index (optional)",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "skip-existing",
+			Type:        "boolean",
+			Required:    false,
+			Location:    "body",
+			Description: "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "custom-metadata",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Custom metadata to attach to all indexed chunks. Keys must be strings. Values: str, int, float, bool, or array of strings.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "parsing-script",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.",
 		})
 
 		type responseSchema struct {
@@ -159,6 +236,28 @@ func runIndexingIndexGcsDirectoryV2(cmd *cobra.Command, args []string) error {
 			cliErr.Write(os.Stderr)
 			return output.NewExitError(cliErr)
 		}
+	}
+	// Individual flags overlay onto body (flags take precedence over --body JSON)
+	if cmd.Flags().Changed("bucket-name") {
+		bodyMap["bucket_name"] = indexingIndexGcsDirectoryV2Flags.bucketName
+	}
+	if cmd.Flags().Changed("directory-path") {
+		bodyMap["directory_path"] = indexingIndexGcsDirectoryV2Flags.directoryPath
+	}
+	if cmd.Flags().Changed("service-account-json") {
+		bodyMap["service_account_json"] = indexingIndexGcsDirectoryV2Flags.serviceAccountJson
+	}
+	if cmd.Flags().Changed("processing-type") {
+		bodyMap["processing_type"] = indexingIndexGcsDirectoryV2Flags.processingType
+	}
+	if cmd.Flags().Changed("max-files") {
+		bodyMap["max_files"] = indexingIndexGcsDirectoryV2Flags.maxFiles
+	}
+	if cmd.Flags().Changed("skip-existing") {
+		bodyMap["skip_existing"] = indexingIndexGcsDirectoryV2Flags.skipExisting
+	}
+	if cmd.Flags().Changed("parsing-script") {
+		bodyMap["parsing_script"] = indexingIndexGcsDirectoryV2Flags.parsingScript
 	}
 	req.Body = bodyMap
 

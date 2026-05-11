@@ -18,9 +18,14 @@ var indexingIndexGcsFileV2Cmd = &cobra.Command{
 }
 
 var indexingIndexGcsFileV2Flags struct {
-	xOrganizationId string
-	collectionName  string
-	body            string
+	xOrganizationId    string
+	collectionName     string
+	bucketName         string
+	fileUri            string
+	serviceAccountJson string
+	processingType     string
+	parsingScript      string
+	body               string
 }
 
 func init() {
@@ -28,7 +33,17 @@ func init() {
 	indexingIndexGcsFileV2Cmd.MarkFlagRequired("x-organization-id")
 	indexingIndexGcsFileV2Cmd.Flags().StringVar(&indexingIndexGcsFileV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexGcsFileV2Cmd.MarkFlagRequired("collection-name")
-	indexingIndexGcsFileV2Cmd.Flags().StringVar(&indexingIndexGcsFileV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexGcsFileV2Cmd.Flags().StringVar(&indexingIndexGcsFileV2Flags.bucketName, "bucket-name", "", "Name of the GCS bucket")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsFileV2Cmd.Flags().StringVar(&indexingIndexGcsFileV2Flags.fileUri, "file-uri", "", "GCS URI format: gs://bucket-name/path/to/file.pdf")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsFileV2Cmd.Flags().StringVar(&indexingIndexGcsFileV2Flags.serviceAccountJson, "service-account-json", "", "GCP service account JSON key with read access to the bucket")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsFileV2Cmd.Flags().StringVar(&indexingIndexGcsFileV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsFileV2Cmd.Flags().StringVar(&indexingIndexGcsFileV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexGcsFileV2Cmd.Flags().StringVar(&indexingIndexGcsFileV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexGcsFileV2Cmd)
 }
@@ -57,6 +72,48 @@ func runIndexingIndexGcsFileV2(cmd *cobra.Command, args []string) error {
 			Required:    true,
 			Location:    "path",
 			Description: "Name of the collection to index into",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "bucket-name",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Name of the GCS bucket",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "file-uri",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "GCS URI format: gs://bucket-name/path/to/file.pdf",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "service-account-json",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "GCP service account JSON key with read access to the bucket",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "processing-type",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "custom-metadata",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Custom metadata to attach to all chunks from this file. Keys must be strings. Values: str, int, float, bool, or array of strings.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "parsing-script",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.",
 		})
 
 		type responseSchema struct {
@@ -147,6 +204,22 @@ func runIndexingIndexGcsFileV2(cmd *cobra.Command, args []string) error {
 			cliErr.Write(os.Stderr)
 			return output.NewExitError(cliErr)
 		}
+	}
+	// Individual flags overlay onto body (flags take precedence over --body JSON)
+	if cmd.Flags().Changed("bucket-name") {
+		bodyMap["bucket_name"] = indexingIndexGcsFileV2Flags.bucketName
+	}
+	if cmd.Flags().Changed("file-uri") {
+		bodyMap["file_uri"] = indexingIndexGcsFileV2Flags.fileUri
+	}
+	if cmd.Flags().Changed("service-account-json") {
+		bodyMap["service_account_json"] = indexingIndexGcsFileV2Flags.serviceAccountJson
+	}
+	if cmd.Flags().Changed("processing-type") {
+		bodyMap["processing_type"] = indexingIndexGcsFileV2Flags.processingType
+	}
+	if cmd.Flags().Changed("parsing-script") {
+		bodyMap["parsing_script"] = indexingIndexGcsFileV2Flags.parsingScript
 	}
 	req.Body = bodyMap
 

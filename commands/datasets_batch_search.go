@@ -37,7 +37,7 @@ func init() {
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
 	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.author, "author", "", "Filter results by author/byline name. Used as an AND condition with `q`  -  returns only articles matching BOTH the query topic AND the specified author. For all articles by an author regardless of topic, use a broad query like `q=*` with `author`.")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
-	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	datasetsCmd.AddCommand(datasetsBatchSearchCmd)
 }
@@ -63,7 +63,7 @@ func runDatasetsBatchSearch(cmd *cobra.Command, args []string) error {
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
-			Required:    false,
+			Required:    true,
 			Location:    "body",
 			Description: "Search query",
 		})

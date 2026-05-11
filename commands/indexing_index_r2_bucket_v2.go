@@ -21,6 +21,15 @@ var indexingIndexR2BucketV2Flags struct {
 	xOrganizationId string
 	collectionName  string
 	idempotencyKey  string
+	bucketName      string
+	accountId       string
+	accessKeyId     string
+	secretAccessKey string
+	jurisdiction    string
+	processingType  string
+	maxFiles        int
+	skipExisting    bool
+	parsingScript   string
 	body            string
 }
 
@@ -30,7 +39,25 @@ func init() {
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexR2BucketV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
-	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.bucketName, "bucket-name", "", "Name of the R2 bucket")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.accountId, "account-id", "", "Cloudflare account ID (found in your R2 dashboard URL)")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.accessKeyId, "access-key-id", "", "R2 S3 API token Access Key ID")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.secretAccessKey, "secret-access-key", "", "R2 S3 API token Secret Access Key")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.jurisdiction, "jurisdiction", "", "R2 jurisdiction. 'default' for global, 'eu' for EU-only storage, 'fedramp' for FedRAMP-compliant storage.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().IntVar(&indexingIndexR2BucketV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().BoolVar(&indexingIndexR2BucketV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
+	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexR2BucketV2Cmd)
 }
@@ -66,6 +93,76 @@ func runIndexingIndexR2BucketV2(cmd *cobra.Command, args []string) error {
 			Required:    false,
 			Location:    "header",
 			Description: "UUID for request deduplication",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "bucket-name",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Name of the R2 bucket",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "account-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Cloudflare account ID (found in your R2 dashboard URL)",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "access-key-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "R2 S3 API token Access Key ID",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "secret-access-key",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "R2 S3 API token Secret Access Key",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "jurisdiction",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "R2 jurisdiction. 'default' for global, 'eu' for EU-only storage, 'fedramp' for FedRAMP-compliant storage.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "processing-type",
+			Type:        "string",
+			Required:    true,
+			Location:    "body",
+			Description: "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "max-files",
+			Type:        "integer",
+			Required:    false,
+			Location:    "body",
+			Description: "Maximum number of files to index (optional)",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "skip-existing",
+			Type:        "boolean",
+			Required:    false,
+			Location:    "body",
+			Description: "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "custom-metadata",
+			Type:        "object",
+			Required:    false,
+			Location:    "body",
+			Description: "Custom metadata to attach to all indexed chunks. Keys must be strings. Values: str, int, float, bool, or array of strings.",
+		})
+		flags = append(flags, flagSchema{
+			Name:        "parsing-script",
+			Type:        "string",
+			Required:    false,
+			Location:    "body",
+			Description: "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.",
 		})
 
 		type responseSchema struct {
@@ -159,6 +256,34 @@ func runIndexingIndexR2BucketV2(cmd *cobra.Command, args []string) error {
 			cliErr.Write(os.Stderr)
 			return output.NewExitError(cliErr)
 		}
+	}
+	// Individual flags overlay onto body (flags take precedence over --body JSON)
+	if cmd.Flags().Changed("bucket-name") {
+		bodyMap["bucket_name"] = indexingIndexR2BucketV2Flags.bucketName
+	}
+	if cmd.Flags().Changed("account-id") {
+		bodyMap["account_id"] = indexingIndexR2BucketV2Flags.accountId
+	}
+	if cmd.Flags().Changed("access-key-id") {
+		bodyMap["access_key_id"] = indexingIndexR2BucketV2Flags.accessKeyId
+	}
+	if cmd.Flags().Changed("secret-access-key") {
+		bodyMap["secret_access_key"] = indexingIndexR2BucketV2Flags.secretAccessKey
+	}
+	if cmd.Flags().Changed("jurisdiction") {
+		bodyMap["jurisdiction"] = indexingIndexR2BucketV2Flags.jurisdiction
+	}
+	if cmd.Flags().Changed("processing-type") {
+		bodyMap["processing_type"] = indexingIndexR2BucketV2Flags.processingType
+	}
+	if cmd.Flags().Changed("max-files") {
+		bodyMap["max_files"] = indexingIndexR2BucketV2Flags.maxFiles
+	}
+	if cmd.Flags().Changed("skip-existing") {
+		bodyMap["skip_existing"] = indexingIndexR2BucketV2Flags.skipExisting
+	}
+	if cmd.Flags().Changed("parsing-script") {
+		bodyMap["parsing_script"] = indexingIndexR2BucketV2Flags.parsingScript
 	}
 	req.Body = bodyMap
 

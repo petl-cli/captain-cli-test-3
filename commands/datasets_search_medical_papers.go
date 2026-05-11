@@ -40,7 +40,7 @@ func init() {
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
 	datasetsSearchMedicalPapersCmd.Flags().BoolVar(&datasetsSearchMedicalPapersFlags.stream, "stream", false, "If true, response is text/event-stream; otherwise JSON.")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
-	datasetsSearchMedicalPapersCmd.Flags().StringVar(&datasetsSearchMedicalPapersFlags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	datasetsSearchMedicalPapersCmd.Flags().StringVar(&datasetsSearchMedicalPapersFlags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	datasetsCmd.AddCommand(datasetsSearchMedicalPapersCmd)
 }
@@ -66,7 +66,7 @@ func runDatasetsSearchMedicalPapers(cmd *cobra.Command, args []string) error {
 		flags = append(flags, flagSchema{
 			Name:        "question",
 			Type:        "string",
-			Required:    false,
+			Required:    true,
 			Location:    "body",
 			Description: "Natural-language question.",
 		})

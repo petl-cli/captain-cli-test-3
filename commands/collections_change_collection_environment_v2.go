@@ -31,7 +31,7 @@ func init() {
 	collectionsChangeCollectionEnvironmentV2Cmd.MarkFlagRequired("collection-name")
 	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.newEnvironment, "new-environment", "", "The target environment to move the collection to")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
-	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
+	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	collectionsCmd.AddCommand(collectionsChangeCollectionEnvironmentV2Cmd)
 }
@@ -64,7 +64,7 @@ func runCollectionsChangeCollectionEnvironmentV2(cmd *cobra.Command, args []stri
 		flags = append(flags, flagSchema{
 			Name:        "new-environment",
 			Type:        "string",
-			Required:    false,
+			Required:    true,
 			Location:    "body",
 			Description: "The target environment to move the collection to",
 		})
