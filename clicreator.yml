@@ -1,0 +1,184 @@
+cli:
+  name: captain-api-v2
+  env_prefix: CAPTAIN_API_V2
+  version: "0.1.0"
+
+environments:
+  production: https://api.runcaptain.com
+
+security_schemes:
+  BearerAuth:
+    type: http
+    scheme: bearer
+
+security:
+  - BearerAuth: []
+
+client_settings:
+  opts:
+    api_key:
+      type: string
+      read_env: CAPTAIN_API_V2_BEARER_TOKEN
+      auth:
+        security_scheme: BearerAuth
+
+resources:
+  collections:
+    methods:
+      list-collections-v2: "get /v2/collections"
+      create-collection-v2: "put /v2/collections/{collection_name}"
+      delete-collection-v2: "delete /v2/collections/{collection_name}"
+      change-collection-environment-v2: "patch /v2/collections/{collection_name}/environment"
+      list-documents-v2: "get /v2/collections/{collection_name}/documents"
+      wipe-collection-documents-v2: "delete /v2/collections/{collection_name}/documents"
+      delete-document-v2: "delete /v2/collections/{collection_name}/documents/{document_id}"
+  query:
+    methods:
+      collection-v2: "post /v2/collections/{collection_name}/query"
+  indexing:
+    methods:
+      index-s3-bucket-v2: "post /v2/collections/{collection_name}/index/s3"
+      index-s3-file-v2: "post /v2/collections/{collection_name}/index/s3/file"
+      index-gcs-bucket-v2: "post /v2/collections/{collection_name}/index/gcs"
+      index-gcs-file-v2: "post /v2/collections/{collection_name}/index/gcs/file"
+      index-s3-directory-v2: "post /v2/collections/{collection_name}/index/s3/directory"
+      index-gcs-directory-v2: "post /v2/collections/{collection_name}/index/gcs/directory"
+      index-azure-container-v2: "post /v2/collections/{collection_name}/index/azure"
+      index-azure-file-v2: "post /v2/collections/{collection_name}/index/azure/file"
+      index-azure-directory-v2: "post /v2/collections/{collection_name}/index/azure/directory"
+      index-r2-bucket-v2: "post /v2/collections/{collection_name}/index/r2"
+      index-r2-file-v2: "post /v2/collections/{collection_name}/index/r2/file"
+      index-r2-directory-v2: "post /v2/collections/{collection_name}/index/r2/directory"
+      index-url-v2: "post /v2/collections/{collection_name}/index/url"
+      index-youtube-v2: "post /v2/collections/{collection_name}/index/youtube"
+      index-text-v2: "post /v2/collections/{collection_name}/index/text"
+      index-file-v2: "post /v2/collections/{collection_name}/index/file"
+      validate-parsing-script-v2: "post /v2/parsing-scripts/validate"
+  jobs:
+    methods:
+      get-job-status-v2: "get /v2/jobs/{job_id}"
+      delete-job-v2: "delete /v2/jobs/{job_id}"
+      rollback-job-v2: "patch /v2/jobs/{job_id}/rollback"
+  datasets:
+    methods:
+      search: "get /v2/datasets/{dataset}/search"
+      batch-search: "post /v2/datasets/batch-search"
+      get-dataset-article: "get /v2/datasets/{dataset}/{url}"
+      search-medical-papers: "post /v2/datasets/scientific/medical/ask"
+  general:
+    methods:
+      search: "get /v2/datasets/odyssey/general/search"
+      search-shared: "get /v2/datasets/odyssey/general/search/shared"
+      entity-people: "get /v2/datasets/odyssey/general/{entity_id}/people"
+      entity-locations: "get /v2/datasets/odyssey/general/{entity_id}/locations"
+      entity-affiliates: "get /v2/datasets/odyssey/general/{entity_id}/affiliates"
+      entity-news: "get /v2/datasets/odyssey/general/{entity_id}/news"
+  companies:
+    methods:
+      search: "get /v2/datasets/odyssey/companies/search"
+      full: "get /v2/datasets/odyssey/companies/{company_id}/full"
+      bio: "get /v2/datasets/odyssey/companies/{company_id}/bio"
+      financials: "get /v2/datasets/odyssey/companies/{company_id}/financials"
+      financials-recent: "get /v2/datasets/odyssey/companies/{company_id}/financials/recent"
+      financing-recent: "get /v2/datasets/odyssey/companies/{company_id}/financing/recent"
+      active-investors: "get /v2/datasets/odyssey/companies/{company_id}/active-investors"
+      deals: "get /v2/datasets/odyssey/companies/{company_id}/deals"
+      service-providers: "get /v2/datasets/odyssey/companies/{company_id}/service-providers"
+      service-providers-deal: "get /v2/datasets/odyssey/companies/{company_id}/service-providers/deal"
+      debt-financing-recent: "get /v2/datasets/odyssey/companies/{company_id}/debt-financing/recent"
+      similar: "get /v2/datasets/odyssey/companies/{company_id}/similar"
+      vc-exit-predictions: "get /v2/datasets/odyssey/companies/{company_id}/vc-exit-predictions"
+  people:
+    methods:
+      search: "get /v2/datasets/odyssey/people/search"
+      bio: "get /v2/datasets/odyssey/people/{person_id}/bio"
+  deals:
+    methods:
+      search: "get /v2/datasets/odyssey/deals/search"
+      bio: "get /v2/datasets/odyssey/deals/{id}/bio"
+      investors: "get /v2/datasets/odyssey/deals/{id}/investors"
+      service-providers: "get /v2/datasets/odyssey/deals/{id}/service-providers"
+      valuation: "get /v2/datasets/odyssey/deals/{id}/valuation"
+      stock-info: "get /v2/datasets/odyssey/deals/{id}/stock-info"
+      cap-table: "get /v2/datasets/odyssey/deals/{id}/cap-table"
+      tranche: "get /v2/datasets/odyssey/deals/{id}/tranche"
+      debt-lenders: "get /v2/datasets/odyssey/deals/{id}/debt-lenders"
+      multiples: "get /v2/datasets/odyssey/deals/{id}/multiples"
+  investors:
+    methods:
+      search: "get /v2/datasets/odyssey/investors/search"
+      bio: "get /v2/datasets/odyssey/investors/{id}/bio"
+      active-investments: "get /v2/datasets/odyssey/investors/{id}/active-investments"
+      preferences: "get /v2/datasets/odyssey/investors/{id}/preferences"
+      funds: "get /v2/datasets/odyssey/investors/{id}/funds"
+      funds-latest: "get /v2/datasets/odyssey/investors/{id}/funds/latest"
+      board-seats: "get /v2/datasets/odyssey/investors/{id}/board-seats"
+      service-providers: "get /v2/datasets/odyssey/investors/{id}/service-providers"
+      service-providers-deal: "get /v2/datasets/odyssey/investors/{id}/service-providers/deal"
+  funds:
+    methods:
+      search: "get /v2/datasets/odyssey/funds/search"
+      bio: "get /v2/datasets/odyssey/funds/{fund_id}/bio"
+      performance: "get /v2/datasets/odyssey/funds/{fund_id}/performance"
+      active-investments: "get /v2/datasets/odyssey/funds/{fund_id}/active-investments"
+      commitments: "get /v2/datasets/odyssey/funds/{fund_id}/commitments"
+      cash-flows: "get /v2/datasets/odyssey/funds/{fund_id}/cash-flows"
+      benchmark: "get /v2/datasets/odyssey/funds/{fund_id}/benchmark"
+      preferences: "get /v2/datasets/odyssey/funds/{fund_id}/preferences"
+  limited-partners:
+    methods:
+      lps-search: "get /v2/datasets/odyssey/limited-partners/search"
+      lps-bio: "get /v2/datasets/odyssey/limited-partners/{lp_id}/bio"
+      lps-commitments-detailed: "get /v2/datasets/odyssey/limited-partners/{lp_id}/commitments/detailed"
+      lps-commitments-aggregates: "get /v2/datasets/odyssey/limited-partners/{lp_id}/commitments/aggregates"
+      lps-allocations-target: "get /v2/datasets/odyssey/limited-partners/{lp_id}/allocations/target"
+      lps-allocations-actual: "get /v2/datasets/odyssey/limited-partners/{lp_id}/allocations/actual"
+      lps-commitment-preferences: "get /v2/datasets/odyssey/limited-partners/{lp_id}/commitment-preferences"
+      lps-service-providers: "get /v2/datasets/odyssey/limited-partners/{lp_id}/service-providers"
+  service-providers:
+    methods:
+      search: "get /v2/datasets/odyssey/service-providers/search"
+      bio: "get /v2/datasets/odyssey/service-providers/{provider_id}/bio"
+      companies: "get /v2/datasets/odyssey/service-providers/{provider_id}/companies"
+      deals: "get /v2/datasets/odyssey/service-providers/{provider_id}/deals"
+      investors: "get /v2/datasets/odyssey/service-providers/{provider_id}/investors"
+      funds: "get /v2/datasets/odyssey/service-providers/{provider_id}/funds"
+      limited-partners: "get /v2/datasets/odyssey/service-providers/{provider_id}/limited-partners"
+  patents:
+    methods:
+      search: "get /v2/datasets/odyssey/patents/search"
+      get-by-id: "get /v2/datasets/odyssey/patents/{id}"
+      get-file: "get /v2/datasets/odyssey/patents/{entityId}/file"
+  credit-analysis:
+    methods:
+      news-search: "get /v2/datasets/odyssey/credit-analysis/news/search"
+      news-recent: "get /v2/datasets/odyssey/credit-analysis/news/recent"
+      news-detail: "get /v2/datasets/odyssey/credit-analysis/news/{newsId}"
+      news-attachment: "get /v2/datasets/odyssey/credit-analysis/news/{newsId}/attachment"
+      news-bulk: "post /v2/datasets/odyssey/credit-analysis/news/bulk"
+      list-bdcs: "get /v2/datasets/odyssey/credit-analysis/bdc"
+      bdc-search: "get /v2/datasets/odyssey/credit-analysis/bdc/search"
+      bdc-portfolio: "get /v2/datasets/odyssey/credit-analysis/bdc/{ticker}/portfolio"
+      bdc-stats: "get /v2/datasets/odyssey/credit-analysis/bdc/{ticker}/stats"
+      borrower-lookup: "get /v2/datasets/odyssey/credit-analysis/borrowers/{name}"
+      market-overview: "get /v2/datasets/odyssey/credit-analysis/market/overview"
+      market-spreads: "get /v2/datasets/odyssey/credit-analysis/market/spreads"
+      lending-standards: "get /v2/datasets/odyssey/credit-analysis/market/lending-standards"
+      funds-search: "get /v2/datasets/odyssey/credit-analysis/funds/search"
+      fund-formations: "get /v2/datasets/odyssey/credit-analysis/funds/formations"
+      list-managers: "get /v2/datasets/odyssey/credit-analysis/funds/managers"
+      manager-detail: "get /v2/datasets/odyssey/credit-analysis/funds/managers/{name}"
+      sba-search: "get /v2/datasets/odyssey/credit-analysis/sba/search"
+      sba-stats: "get /v2/datasets/odyssey/credit-analysis/sba/stats"
+      agreements-search: "get /v2/datasets/odyssey/credit-analysis/agreements/search"
+      agreement-detail: "get /v2/datasets/odyssey/credit-analysis/agreements/{company}"
+      nport-funds: "get /v2/datasets/odyssey/credit-analysis/nport/funds"
+      nport-search: "get /v2/datasets/odyssey/credit-analysis/nport/search"
+      nport-fund-filings: "get /v2/datasets/odyssey/credit-analysis/nport/{ticker}/filings"
+      relationships-search: "get /v2/datasets/odyssey/credit-analysis/relationships/search"
+      ucc-portals: "get /v2/datasets/odyssey/credit-analysis/relationships/portals"
+  sandbox-data:
+    methods:
+      fundamentals-sandbox: "get /v2/datasets/odyssey/fundamentals/sandbox"
+      fundamentals-lookup-tables: "get /v2/datasets/odyssey/fundamentals/lookup-tables"
+      fundamentals-lookup-table-values: "get /v2/datasets/odyssey/fundamentals/lookup-tables/{tableId}"
