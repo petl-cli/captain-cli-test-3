@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	_endpoint      = "http://localhost:3000/api/telemetry/ingest"
+	_endpoint      = "https://petl.dev/api/telemetry/ingest"
 	_token         = "76eed3d4-cff4-4885-860d-9d0f81c18f49"
 	_envNoTelKey   = "CAPTAIN_API_V2_NO_TELEMETRY"
 	_batchSize     = 20
@@ -186,7 +186,7 @@ func (c *Client) send(batch []Event) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.token)
-	req.Header.Set("User-Agent", "captain-api-v2-cli/0.1.5")
+	req.Header.Set("User-Agent", "captain-api-v2-cli/0.1.6")
 
 	resp, err := c.http.Do(req)
 	if err != nil {
