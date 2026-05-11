@@ -18,10 +18,13 @@ var creditAnalysisUccPortalsCmd = &cobra.Command{
 }
 
 var creditAnalysisUccPortalsFlags struct {
-	state string
+	xOrganizationId string
+	state           string
 }
 
 func init() {
+	creditAnalysisUccPortalsCmd.Flags().StringVar(&creditAnalysisUccPortalsFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisUccPortalsCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisUccPortalsCmd.Flags().StringVar(&creditAnalysisUccPortalsFlags.state, "state", "", "State code (e.g., CA, NY). Omit for all states.")
 
 	creditAnalysisCmd.AddCommand(creditAnalysisUccPortalsCmd)
@@ -38,6 +41,13 @@ func runCreditAnalysisUccPortals(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "state",
 			Type:        "string",
@@ -118,6 +128,9 @@ func runCreditAnalysisUccPortals(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisUccPortalsFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

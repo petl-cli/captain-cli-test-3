@@ -18,11 +18,14 @@ var generalEntityPeopleCmd = &cobra.Command{
 }
 
 var generalEntityPeopleFlags struct {
-	entityId string
-	limit    int
+	xOrganizationId string
+	entityId        string
+	limit           int
 }
 
 func init() {
+	generalEntityPeopleCmd.Flags().StringVar(&generalEntityPeopleFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	generalEntityPeopleCmd.MarkFlagRequired("x-organization-id")
 	generalEntityPeopleCmd.Flags().StringVar(&generalEntityPeopleFlags.entityId, "entity-id", "", "Entity ID (any type)")
 	generalEntityPeopleCmd.MarkFlagRequired("entity-id")
 	generalEntityPeopleCmd.Flags().IntVar(&generalEntityPeopleFlags.limit, "limit", 0, "Maximum results to return (default: 25, max: 100)")
@@ -41,6 +44,13 @@ func runGeneralEntityPeople(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "entity-id",
 			Type:        "string",
@@ -139,6 +149,9 @@ func runGeneralEntityPeople(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", generalEntityPeopleFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

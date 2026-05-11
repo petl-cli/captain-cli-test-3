@@ -18,11 +18,14 @@ var creditAnalysisFundFormationsCmd = &cobra.Command{
 }
 
 var creditAnalysisFundFormationsFlags struct {
-	daysBack int
-	limit    int
+	xOrganizationId string
+	daysBack        int
+	limit           int
 }
 
 func init() {
+	creditAnalysisFundFormationsCmd.Flags().StringVar(&creditAnalysisFundFormationsFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisFundFormationsCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisFundFormationsCmd.Flags().IntVar(&creditAnalysisFundFormationsFlags.daysBack, "days-back", 0, "Look back period in days")
 	creditAnalysisFundFormationsCmd.Flags().IntVar(&creditAnalysisFundFormationsFlags.limit, "limit", 0, "Maximum results")
 
@@ -40,6 +43,13 @@ func runCreditAnalysisFundFormations(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "days-back",
 			Type:        "integer",
@@ -130,6 +140,9 @@ func runCreditAnalysisFundFormations(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisFundFormationsFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

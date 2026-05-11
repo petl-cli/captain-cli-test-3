@@ -18,10 +18,13 @@ var dealsDebtLendersCmd = &cobra.Command{
 }
 
 var dealsDebtLendersFlags struct {
-	id string
+	xOrganizationId string
+	id              string
 }
 
 func init() {
+	dealsDebtLendersCmd.Flags().StringVar(&dealsDebtLendersFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	dealsDebtLendersCmd.MarkFlagRequired("x-organization-id")
 	dealsDebtLendersCmd.Flags().StringVar(&dealsDebtLendersFlags.id, "id", "", "Deal entity ID")
 	dealsDebtLendersCmd.MarkFlagRequired("id")
 
@@ -39,6 +42,13 @@ func runDealsDebtLenders(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "id",
 			Type:        "string",
@@ -127,6 +137,9 @@ func runDealsDebtLenders(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", dealsDebtLendersFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

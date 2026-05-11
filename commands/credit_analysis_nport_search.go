@@ -18,11 +18,14 @@ var creditAnalysisNportSearchCmd = &cobra.Command{
 }
 
 var creditAnalysisNportSearchFlags struct {
-	q     string
-	limit int
+	xOrganizationId string
+	q               string
+	limit           int
 }
 
 func init() {
+	creditAnalysisNportSearchCmd.Flags().StringVar(&creditAnalysisNportSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisNportSearchCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisNportSearchCmd.Flags().StringVar(&creditAnalysisNportSearchFlags.q, "q", "", "Borrower name or keyword")
 	creditAnalysisNportSearchCmd.MarkFlagRequired("q")
 	creditAnalysisNportSearchCmd.Flags().IntVar(&creditAnalysisNportSearchFlags.limit, "limit", 0, "Maximum results")
@@ -41,6 +44,13 @@ func runCreditAnalysisNportSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -131,6 +141,9 @@ func runCreditAnalysisNportSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisNportSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

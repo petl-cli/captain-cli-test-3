@@ -18,10 +18,13 @@ var patentsGetByIdCmd = &cobra.Command{
 }
 
 var patentsGetByIdFlags struct {
-	id string
+	xOrganizationId string
+	id              string
 }
 
 func init() {
+	patentsGetByIdCmd.Flags().StringVar(&patentsGetByIdFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	patentsGetByIdCmd.MarkFlagRequired("x-organization-id")
 	patentsGetByIdCmd.Flags().StringVar(&patentsGetByIdFlags.id, "id", "", "Patent ID or number")
 	patentsGetByIdCmd.MarkFlagRequired("id")
 
@@ -39,6 +42,13 @@ func runPatentsGetById(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "id",
 			Type:        "string",
@@ -127,6 +137,9 @@ func runPatentsGetById(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", patentsGetByIdFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

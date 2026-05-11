@@ -18,11 +18,14 @@ var indexingIndexR2FileV2Cmd = &cobra.Command{
 }
 
 var indexingIndexR2FileV2Flags struct {
-	collectionName string
-	body           string
+	xOrganizationId string
+	collectionName  string
+	body            string
 }
 
 func init() {
+	indexingIndexR2FileV2Cmd.Flags().StringVar(&indexingIndexR2FileV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	indexingIndexR2FileV2Cmd.MarkFlagRequired("x-organization-id")
 	indexingIndexR2FileV2Cmd.Flags().StringVar(&indexingIndexR2FileV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexR2FileV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexR2FileV2Cmd.Flags().StringVar(&indexingIndexR2FileV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
@@ -41,6 +44,13 @@ func runIndexingIndexR2FileV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -119,6 +129,9 @@ func runIndexingIndexR2FileV2(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", indexingIndexR2FileV2Flags.xOrganizationId)
+	}
 
 	// Request body
 	bodyMap := map[string]any{}

@@ -18,11 +18,14 @@ var collectionsDeleteDocumentV2Cmd = &cobra.Command{
 }
 
 var collectionsDeleteDocumentV2Flags struct {
-	collectionName string
-	documentId     string
+	xOrganizationId string
+	collectionName  string
+	documentId      string
 }
 
 func init() {
+	collectionsDeleteDocumentV2Cmd.Flags().StringVar(&collectionsDeleteDocumentV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	collectionsDeleteDocumentV2Cmd.MarkFlagRequired("x-organization-id")
 	collectionsDeleteDocumentV2Cmd.Flags().StringVar(&collectionsDeleteDocumentV2Flags.collectionName, "collection-name", "", "Name of the collection")
 	collectionsDeleteDocumentV2Cmd.MarkFlagRequired("collection-name")
 	collectionsDeleteDocumentV2Cmd.Flags().StringVar(&collectionsDeleteDocumentV2Flags.documentId, "document-id", "", "ID of the document to delete")
@@ -42,6 +45,13 @@ func runCollectionsDeleteDocumentV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -133,6 +143,9 @@ func runCollectionsDeleteDocumentV2(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", collectionsDeleteDocumentV2Flags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

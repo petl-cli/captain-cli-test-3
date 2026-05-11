@@ -18,10 +18,13 @@ var collectionsWipeCollectionDocumentsV2Cmd = &cobra.Command{
 }
 
 var collectionsWipeCollectionDocumentsV2Flags struct {
-	collectionName string
+	xOrganizationId string
+	collectionName  string
 }
 
 func init() {
+	collectionsWipeCollectionDocumentsV2Cmd.Flags().StringVar(&collectionsWipeCollectionDocumentsV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	collectionsWipeCollectionDocumentsV2Cmd.MarkFlagRequired("x-organization-id")
 	collectionsWipeCollectionDocumentsV2Cmd.Flags().StringVar(&collectionsWipeCollectionDocumentsV2Flags.collectionName, "collection-name", "", "Name of the collection to wipe")
 	collectionsWipeCollectionDocumentsV2Cmd.MarkFlagRequired("collection-name")
 
@@ -39,6 +42,13 @@ func runCollectionsWipeCollectionDocumentsV2(cmd *cobra.Command, args []string) 
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -117,6 +127,9 @@ func runCollectionsWipeCollectionDocumentsV2(cmd *cobra.Command, args []string) 
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", collectionsWipeCollectionDocumentsV2Flags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

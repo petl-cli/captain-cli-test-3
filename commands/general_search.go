@@ -18,12 +18,15 @@ var generalSearchCmd = &cobra.Command{
 }
 
 var generalSearchFlags struct {
-	q          string
-	entityType string
-	limit      int
+	xOrganizationId string
+	q               string
+	entityType      string
+	limit           int
 }
 
 func init() {
+	generalSearchCmd.Flags().StringVar(&generalSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	generalSearchCmd.MarkFlagRequired("x-organization-id")
 	generalSearchCmd.Flags().StringVar(&generalSearchFlags.q, "q", "", "Search query across all entity types (companies, people, investors)")
 	generalSearchCmd.MarkFlagRequired("q")
 	generalSearchCmd.Flags().StringVar(&generalSearchFlags.entityType, "entity-type", "", "Filter by entity type")
@@ -43,6 +46,13 @@ func runGeneralSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -148,6 +158,9 @@ func runGeneralSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", generalSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

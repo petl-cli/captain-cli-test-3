@@ -18,10 +18,13 @@ var limitedPartnersLpsCommitmentPreferencesCmd = &cobra.Command{
 }
 
 var limitedPartnersLpsCommitmentPreferencesFlags struct {
-	lpId string
+	xOrganizationId string
+	lpId            string
 }
 
 func init() {
+	limitedPartnersLpsCommitmentPreferencesCmd.Flags().StringVar(&limitedPartnersLpsCommitmentPreferencesFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	limitedPartnersLpsCommitmentPreferencesCmd.MarkFlagRequired("x-organization-id")
 	limitedPartnersLpsCommitmentPreferencesCmd.Flags().StringVar(&limitedPartnersLpsCommitmentPreferencesFlags.lpId, "lp-id", "", "LP entity ID")
 	limitedPartnersLpsCommitmentPreferencesCmd.MarkFlagRequired("lp-id")
 
@@ -39,6 +42,13 @@ func runLimitedPartnersLpsCommitmentPreferences(cmd *cobra.Command, args []strin
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "lp-id",
 			Type:        "string",
@@ -127,6 +137,9 @@ func runLimitedPartnersLpsCommitmentPreferences(cmd *cobra.Command, args []strin
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", limitedPartnersLpsCommitmentPreferencesFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

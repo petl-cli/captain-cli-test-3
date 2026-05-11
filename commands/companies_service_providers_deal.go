@@ -18,10 +18,13 @@ var companiesServiceProvidersDealCmd = &cobra.Command{
 }
 
 var companiesServiceProvidersDealFlags struct {
-	companyId string
+	xOrganizationId string
+	companyId       string
 }
 
 func init() {
+	companiesServiceProvidersDealCmd.Flags().StringVar(&companiesServiceProvidersDealFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	companiesServiceProvidersDealCmd.MarkFlagRequired("x-organization-id")
 	companiesServiceProvidersDealCmd.Flags().StringVar(&companiesServiceProvidersDealFlags.companyId, "company-id", "", "Company entity ID, website domain, or company name (e.g., 'openai.com', 'OpenAI', or UUID)")
 	companiesServiceProvidersDealCmd.MarkFlagRequired("company-id")
 
@@ -39,6 +42,13 @@ func runCompaniesServiceProvidersDeal(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "company-id",
 			Type:        "string",
@@ -132,6 +142,9 @@ func runCompaniesServiceProvidersDeal(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", companiesServiceProvidersDealFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

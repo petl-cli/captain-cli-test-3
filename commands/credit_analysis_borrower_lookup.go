@@ -18,10 +18,13 @@ var creditAnalysisBorrowerLookupCmd = &cobra.Command{
 }
 
 var creditAnalysisBorrowerLookupFlags struct {
-	name string
+	xOrganizationId string
+	name            string
 }
 
 func init() {
+	creditAnalysisBorrowerLookupCmd.Flags().StringVar(&creditAnalysisBorrowerLookupFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisBorrowerLookupCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisBorrowerLookupCmd.Flags().StringVar(&creditAnalysisBorrowerLookupFlags.name, "name", "", "Borrower/company name")
 	creditAnalysisBorrowerLookupCmd.MarkFlagRequired("name")
 
@@ -39,6 +42,13 @@ func runCreditAnalysisBorrowerLookup(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "name",
 			Type:        "string",
@@ -117,6 +127,9 @@ func runCreditAnalysisBorrowerLookup(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisBorrowerLookupFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

@@ -18,10 +18,13 @@ var creditAnalysisManagerDetailCmd = &cobra.Command{
 }
 
 var creditAnalysisManagerDetailFlags struct {
-	name string
+	xOrganizationId string
+	name            string
 }
 
 func init() {
+	creditAnalysisManagerDetailCmd.Flags().StringVar(&creditAnalysisManagerDetailFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisManagerDetailCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisManagerDetailCmd.Flags().StringVar(&creditAnalysisManagerDetailFlags.name, "name", "", "Manager name (e.g., 'Ares Management')")
 	creditAnalysisManagerDetailCmd.MarkFlagRequired("name")
 
@@ -39,6 +42,13 @@ func runCreditAnalysisManagerDetail(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "name",
 			Type:        "string",
@@ -117,6 +127,9 @@ func runCreditAnalysisManagerDetail(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisManagerDetailFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

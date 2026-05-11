@@ -57,11 +57,11 @@ captain-api-v2 groups operations by resource. One or two examples per group belo
 ### ` + "`" + `collections` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 collections change-collection-environment-v2 --collection-name <string> --body '{...}'    # Change Collection Environment
+captain-api-v2 collections change-collection-environment-v2 --x-organization-id <string> --collection-name <string> --body '{...}'    # Change Collection Environment
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 collections create-collection-v2 --collection-name <string>    # Create Collection
+captain-api-v2 collections create-collection-v2 --x-organization-id <string> --collection-name <string>    # Create Collection
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 collections --help` + "`" + `
@@ -69,11 +69,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 collections --help` +
 ### ` + "`" + `companies` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 companies active-investors --company-id <string>    # Get Company Active Investors
+captain-api-v2 companies active-investors --x-organization-id <string> --company-id <string>    # Get Company Active Investors
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 companies bio --company-id <string>    # Get Company Bio
+captain-api-v2 companies bio --x-organization-id <string> --company-id <string>    # Get Company Bio
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 companies --help` + "`" + `
@@ -81,11 +81,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 companies --help` + "
 ### ` + "`" + `credit-analysis` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 credit-analysis agreement-detail --company <string>    # Get Agreement Detail
+captain-api-v2 credit-analysis agreement-detail --x-organization-id <string> --company <string>    # Get Agreement Detail
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 credit-analysis agreements-search    # Search Credit Agreements
+captain-api-v2 credit-analysis agreements-search --x-organization-id <string>    # Search Credit Agreements
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 credit-analysis --help` + "`" + `
@@ -93,11 +93,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 credit-analysis --hel
 ### ` + "`" + `datasets` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 datasets batch-search --body '{...}'    # Batch Search Articles
+captain-api-v2 datasets batch-search --x-organization-id <string> --body '{...}'    # Batch Search Articles
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 datasets get-dataset-article --dataset <string> --url <string>    # Get Dataset Article
+captain-api-v2 datasets get-dataset-article --x-organization-id <string> --dataset <string> --url <string>    # Get Dataset Article
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 datasets --help` + "`" + `
@@ -105,11 +105,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 datasets --help` + "`
 ### ` + "`" + `deals` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 deals bio --id <string>    # Get Deal Bio
+captain-api-v2 deals bio --x-organization-id <string> --id <string>    # Get Deal Bio
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 deals cap-table --id <string>    # Get Deal Cap Table
+captain-api-v2 deals cap-table --x-organization-id <string> --id <string>    # Get Deal Cap Table
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 deals --help` + "`" + `
@@ -117,11 +117,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 deals --help` + "`" +
 ### ` + "`" + `funds` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 funds active-investments --fund-id <string>    # Get Fund Active Investments
+captain-api-v2 funds active-investments --x-organization-id <string> --fund-id <string>    # Get Fund Active Investments
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 funds benchmark --fund-id <string>    # Get Fund Benchmark Comparison
+captain-api-v2 funds benchmark --x-organization-id <string> --fund-id <string>    # Get Fund Benchmark Comparison
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 funds --help` + "`" + `
@@ -129,11 +129,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 funds --help` + "`" +
 ### ` + "`" + `general` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 general entity-affiliates --entity-id <string>    # Get Entity Affiliates
+captain-api-v2 general entity-affiliates --x-organization-id <string> --entity-id <string>    # Get Entity Affiliates
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 general entity-locations --entity-id <string>    # Get Entity Locations
+captain-api-v2 general entity-locations --x-organization-id <string> --entity-id <string>    # Get Entity Locations
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 general --help` + "`" + `
@@ -141,11 +141,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 general --help` + "`"
 ### ` + "`" + `indexing` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 indexing index-azure-container-v2 --collection-name <string> --body '{...}'    # Index Azure Container
+captain-api-v2 indexing index-azure-container-v2 --x-organization-id <string> --collection-name <string> --body '{...}'    # Index Azure Container
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 indexing index-azure-directory-v2 --collection-name <string> --body '{...}'    # Index Azure Directory
+captain-api-v2 indexing index-azure-directory-v2 --x-organization-id <string> --collection-name <string> --body '{...}'    # Index Azure Directory
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 indexing --help` + "`" + `
@@ -153,11 +153,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 indexing --help` + "`
 ### ` + "`" + `investors` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 investors active-investments --id <string>    # Get Investor Active Investments
+captain-api-v2 investors active-investments --x-organization-id <string> --id <string>    # Get Investor Active Investments
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 investors bio --id <string>    # Get Investor Bio
+captain-api-v2 investors bio --x-organization-id <string> --id <string>    # Get Investor Bio
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 investors --help` + "`" + `
@@ -165,11 +165,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 investors --help` + "
 ### ` + "`" + `jobs` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 jobs delete-job-v2 --job-id <string>    # Delete Job
+captain-api-v2 jobs delete-job-v2 --x-organization-id <string> --job-id <string>    # Delete Job
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 jobs get-job-status-v2 --job-id <string>    # Get Job Status
+captain-api-v2 jobs get-job-status-v2 --x-organization-id <string> --job-id <string>    # Get Job Status
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 jobs --help` + "`" + `
@@ -177,11 +177,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 jobs --help` + "`" + 
 ### ` + "`" + `limited-partners` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 limited-partners lps-allocations-actual --lp-id <string>    # Get LP Actual Allocations
+captain-api-v2 limited-partners lps-allocations-actual --x-organization-id <string> --lp-id <string>    # Get LP Actual Allocations
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 limited-partners lps-allocations-target --lp-id <string>    # Get LP Target Allocations
+captain-api-v2 limited-partners lps-allocations-target --x-organization-id <string> --lp-id <string>    # Get LP Target Allocations
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 limited-partners --help` + "`" + `
@@ -189,11 +189,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 limited-partners --he
 ### ` + "`" + `patents` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 patents get-by-id --id <string>    # Get Patent Details
+captain-api-v2 patents get-by-id --x-organization-id <string> --id <string>    # Get Patent Details
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 patents get-file --entity-id <string>    # Get Patent File
+captain-api-v2 patents get-file --x-organization-id <string> --entity-id <string>    # Get Patent File
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 patents --help` + "`" + `
@@ -201,11 +201,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 patents --help` + "`"
 ### ` + "`" + `people` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 people bio --person-id <string>    # Enrich Person
+captain-api-v2 people bio --x-organization-id <string> --person-id <string>    # Enrich Person
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 people search --q <string>    # Search People
+captain-api-v2 people search --x-organization-id <string> --q <string>    # Search People
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 people --help` + "`" + `
@@ -213,7 +213,7 @@ List all commands in this group: ` + "`" + `captain-api-v2 people --help` + "`" 
 ### ` + "`" + `query` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 query collection-v2 --collection-name <string> --body '{...}'    # Query Collection
+captain-api-v2 query collection-v2 --x-organization-id <string> --collection-name <string> --body '{...}'    # Query Collection
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 query --help` + "`" + `
@@ -221,11 +221,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 query --help` + "`" +
 ### ` + "`" + `sandbox-data` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 sandbox-data fundamentals-lookup-table-values --table-id <string>    # Get Lookup Table Values
+captain-api-v2 sandbox-data fundamentals-lookup-table-values --x-organization-id <string> --table-id <string>    # Get Lookup Table Values
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 sandbox-data fundamentals-lookup-tables    # Get Lookup Tables
+captain-api-v2 sandbox-data fundamentals-lookup-tables --x-organization-id <string>    # Get Lookup Tables
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 sandbox-data --help` + "`" + `
@@ -233,11 +233,11 @@ List all commands in this group: ` + "`" + `captain-api-v2 sandbox-data --help` 
 ### ` + "`" + `service-providers` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 service-providers bio --provider-id <string>    # Get Service Provider Bio
+captain-api-v2 service-providers bio --x-organization-id <string> --provider-id <string>    # Get Service Provider Bio
 ` + "`" + `` + "`" + `` + "`" + `
 
 ` + "`" + `` + "`" + `` + "`" + `bash
-captain-api-v2 service-providers companies --provider-id <string>    # Get Service Provider Company Clients
+captain-api-v2 service-providers companies --x-organization-id <string> --provider-id <string>    # Get Service Provider Company Clients
 ` + "`" + `` + "`" + `` + "`" + `
 
 List all commands in this group: ` + "`" + `captain-api-v2 service-providers --help` + "`" + `

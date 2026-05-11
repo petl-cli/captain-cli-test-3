@@ -18,12 +18,15 @@ var collectionsListDocumentsV2Cmd = &cobra.Command{
 }
 
 var collectionsListDocumentsV2Flags struct {
-	collectionName string
-	limit          int
-	offset         int
+	xOrganizationId string
+	collectionName  string
+	limit           int
+	offset          int
 }
 
 func init() {
+	collectionsListDocumentsV2Cmd.Flags().StringVar(&collectionsListDocumentsV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	collectionsListDocumentsV2Cmd.MarkFlagRequired("x-organization-id")
 	collectionsListDocumentsV2Cmd.Flags().StringVar(&collectionsListDocumentsV2Flags.collectionName, "collection-name", "", "Name of the collection")
 	collectionsListDocumentsV2Cmd.MarkFlagRequired("collection-name")
 	collectionsListDocumentsV2Cmd.Flags().IntVar(&collectionsListDocumentsV2Flags.limit, "limit", 0, "Maximum number of documents to return")
@@ -43,6 +46,13 @@ func runCollectionsListDocumentsV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -141,6 +151,9 @@ func runCollectionsListDocumentsV2(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", collectionsListDocumentsV2Flags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

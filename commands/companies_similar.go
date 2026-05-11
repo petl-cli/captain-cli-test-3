@@ -18,11 +18,14 @@ var companiesSimilarCmd = &cobra.Command{
 }
 
 var companiesSimilarFlags struct {
-	companyId string
-	limit     int
+	xOrganizationId string
+	companyId       string
+	limit           int
 }
 
 func init() {
+	companiesSimilarCmd.Flags().StringVar(&companiesSimilarFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	companiesSimilarCmd.MarkFlagRequired("x-organization-id")
 	companiesSimilarCmd.Flags().StringVar(&companiesSimilarFlags.companyId, "company-id", "", "Company entity ID, website domain, or company name (e.g., 'openai.com', 'OpenAI', or UUID)")
 	companiesSimilarCmd.MarkFlagRequired("company-id")
 	companiesSimilarCmd.Flags().IntVar(&companiesSimilarFlags.limit, "limit", 0, "Maximum number of results to return (1�100, default: 10)")
@@ -41,6 +44,13 @@ func runCompaniesSimilar(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "company-id",
 			Type:        "string",
@@ -144,6 +154,9 @@ func runCompaniesSimilar(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", companiesSimilarFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

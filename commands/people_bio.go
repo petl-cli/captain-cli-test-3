@@ -18,10 +18,13 @@ var peopleBioCmd = &cobra.Command{
 }
 
 var peopleBioFlags struct {
-	personId string
+	xOrganizationId string
+	personId        string
 }
 
 func init() {
+	peopleBioCmd.Flags().StringVar(&peopleBioFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	peopleBioCmd.MarkFlagRequired("x-organization-id")
 	peopleBioCmd.Flags().StringVar(&peopleBioFlags.personId, "person-id", "", "Person entity ID")
 	peopleBioCmd.MarkFlagRequired("person-id")
 
@@ -39,6 +42,13 @@ func runPeopleBio(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "person-id",
 			Type:        "string",
@@ -127,6 +137,9 @@ func runPeopleBio(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", peopleBioFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

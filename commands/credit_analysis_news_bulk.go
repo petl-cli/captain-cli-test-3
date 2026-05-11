@@ -18,11 +18,14 @@ var creditAnalysisNewsBulkCmd = &cobra.Command{
 }
 
 var creditAnalysisNewsBulkFlags struct {
-	queries []string
-	body    string
+	xOrganizationId string
+	queries         []string
+	body            string
 }
 
 func init() {
+	creditAnalysisNewsBulkCmd.Flags().StringVar(&creditAnalysisNewsBulkFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisNewsBulkCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisNewsBulkCmd.Flags().StringSliceVar(&creditAnalysisNewsBulkFlags.queries, "queries", nil, "List of search queries")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
 	creditAnalysisNewsBulkCmd.Flags().StringVar(&creditAnalysisNewsBulkFlags.body, "body", "", "Full request body as JSON (overrides individual flags)")
@@ -41,6 +44,13 @@ func runCreditAnalysisNewsBulk(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "queries",
 			Type:        "array",
@@ -123,6 +133,9 @@ func runCreditAnalysisNewsBulk(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisNewsBulkFlags.xOrganizationId)
+	}
 
 	// Request body
 	bodyMap := map[string]any{}

@@ -18,13 +18,16 @@ var creditAnalysisAgreementsSearchCmd = &cobra.Command{
 }
 
 var creditAnalysisAgreementsSearchFlags struct {
-	borrower string
-	lender   string
-	dateFrom string
-	limit    int
+	xOrganizationId string
+	borrower        string
+	lender          string
+	dateFrom        string
+	limit           int
 }
 
 func init() {
+	creditAnalysisAgreementsSearchCmd.Flags().StringVar(&creditAnalysisAgreementsSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisAgreementsSearchCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisAgreementsSearchCmd.Flags().StringVar(&creditAnalysisAgreementsSearchFlags.borrower, "borrower", "", "Borrower/company name")
 	creditAnalysisAgreementsSearchCmd.Flags().StringVar(&creditAnalysisAgreementsSearchFlags.lender, "lender", "", "Lender/agent name")
 	creditAnalysisAgreementsSearchCmd.Flags().StringVar(&creditAnalysisAgreementsSearchFlags.dateFrom, "date-from", "", "Start date (YYYY-MM-DD)")
@@ -44,6 +47,13 @@ func runCreditAnalysisAgreementsSearch(cmd *cobra.Command, args []string) error 
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "borrower",
 			Type:        "string",
@@ -154,6 +164,9 @@ func runCreditAnalysisAgreementsSearch(cmd *cobra.Command, args []string) error 
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisAgreementsSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

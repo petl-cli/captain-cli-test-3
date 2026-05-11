@@ -18,11 +18,14 @@ var generalSearchSharedCmd = &cobra.Command{
 }
 
 var generalSearchSharedFlags struct {
-	q     string
-	limit int
+	xOrganizationId string
+	q               string
+	limit           int
 }
 
 func init() {
+	generalSearchSharedCmd.Flags().StringVar(&generalSearchSharedFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	generalSearchSharedCmd.MarkFlagRequired("x-organization-id")
 	generalSearchSharedCmd.Flags().StringVar(&generalSearchSharedFlags.q, "q", "", "Search query (optional)")
 	generalSearchSharedCmd.Flags().IntVar(&generalSearchSharedFlags.limit, "limit", 0, "Maximum number of results to return (1�100, default: 10)")
 
@@ -40,6 +43,13 @@ func runGeneralSearchShared(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -135,6 +145,9 @@ func runGeneralSearchShared(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", generalSearchSharedFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

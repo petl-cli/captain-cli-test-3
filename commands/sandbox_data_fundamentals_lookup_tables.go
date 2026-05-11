@@ -18,9 +18,12 @@ var sandboxDataFundamentalsLookupTablesCmd = &cobra.Command{
 }
 
 var sandboxDataFundamentalsLookupTablesFlags struct {
+	xOrganizationId string
 }
 
 func init() {
+	sandboxDataFundamentalsLookupTablesCmd.Flags().StringVar(&sandboxDataFundamentalsLookupTablesFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	sandboxDataFundamentalsLookupTablesCmd.MarkFlagRequired("x-organization-id")
 
 	sandboxDataCmd.AddCommand(sandboxDataFundamentalsLookupTablesCmd)
 }
@@ -36,6 +39,13 @@ func runSandboxDataFundamentalsLookupTables(cmd *cobra.Command, args []string) e
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 
 		type responseSchema struct {
 			Status      string `json:"status"`
@@ -111,6 +121,9 @@ func runSandboxDataFundamentalsLookupTables(cmd *cobra.Command, args []string) e
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", sandboxDataFundamentalsLookupTablesFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

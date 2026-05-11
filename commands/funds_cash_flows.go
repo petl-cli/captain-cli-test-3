@@ -18,10 +18,13 @@ var fundsCashFlowsCmd = &cobra.Command{
 }
 
 var fundsCashFlowsFlags struct {
-	fundId string
+	xOrganizationId string
+	fundId          string
 }
 
 func init() {
+	fundsCashFlowsCmd.Flags().StringVar(&fundsCashFlowsFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	fundsCashFlowsCmd.MarkFlagRequired("x-organization-id")
 	fundsCashFlowsCmd.Flags().StringVar(&fundsCashFlowsFlags.fundId, "fund-id", "", "Fund entity ID")
 	fundsCashFlowsCmd.MarkFlagRequired("fund-id")
 
@@ -39,6 +42,13 @@ func runFundsCashFlows(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "fund-id",
 			Type:        "string",
@@ -127,6 +137,9 @@ func runFundsCashFlows(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", fundsCashFlowsFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

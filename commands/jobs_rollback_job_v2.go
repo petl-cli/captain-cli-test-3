@@ -18,10 +18,13 @@ var jobsRollbackJobV2Cmd = &cobra.Command{
 }
 
 var jobsRollbackJobV2Flags struct {
-	jobId string
+	xOrganizationId string
+	jobId           string
 }
 
 func init() {
+	jobsRollbackJobV2Cmd.Flags().StringVar(&jobsRollbackJobV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	jobsRollbackJobV2Cmd.MarkFlagRequired("x-organization-id")
 	jobsRollbackJobV2Cmd.Flags().StringVar(&jobsRollbackJobV2Flags.jobId, "job-id", "", "The job ID to rollback")
 	jobsRollbackJobV2Cmd.MarkFlagRequired("job-id")
 
@@ -39,6 +42,13 @@ func runJobsRollbackJobV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "job-id",
 			Type:        "string",
@@ -127,6 +137,9 @@ func runJobsRollbackJobV2(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", jobsRollbackJobV2Flags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

@@ -18,13 +18,16 @@ var datasetsSearchCmd = &cobra.Command{
 }
 
 var datasetsSearchFlags struct {
-	dataset string
-	q       string
-	limit   int
-	author  string
+	xOrganizationId string
+	dataset         string
+	q               string
+	limit           int
+	author          string
 }
 
 func init() {
+	datasetsSearchCmd.Flags().StringVar(&datasetsSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	datasetsSearchCmd.MarkFlagRequired("x-organization-id")
 	datasetsSearchCmd.Flags().StringVar(&datasetsSearchFlags.dataset, "dataset", "", "The dataset to search. Contact your Account Executive for available datasets.")
 	datasetsSearchCmd.MarkFlagRequired("dataset")
 	datasetsSearchCmd.Flags().StringVar(&datasetsSearchFlags.q, "q", "", "Search query")
@@ -46,6 +49,13 @@ func runDatasetsSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "dataset",
 			Type:        "string",
@@ -174,6 +184,9 @@ func runDatasetsSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", datasetsSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

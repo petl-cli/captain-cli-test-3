@@ -18,14 +18,17 @@ var datasetsBatchSearchCmd = &cobra.Command{
 }
 
 var datasetsBatchSearchFlags struct {
-	q        string
-	datasets []string
-	limit    int
-	author   string
-	body     string
+	xOrganizationId string
+	q               string
+	datasets        []string
+	limit           int
+	author          string
+	body            string
 }
 
 func init() {
+	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	datasetsBatchSearchCmd.MarkFlagRequired("x-organization-id")
 	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.q, "q", "", "Search query")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
 	datasetsBatchSearchCmd.Flags().StringSliceVar(&datasetsBatchSearchFlags.datasets, "datasets", nil, "List of dataset names to search. Defaults to all datasets if not provided.")
@@ -50,6 +53,13 @@ func runDatasetsBatchSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -163,6 +173,9 @@ func runDatasetsBatchSearch(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", datasetsBatchSearchFlags.xOrganizationId)
+	}
 
 	// Request body
 	bodyMap := map[string]any{}

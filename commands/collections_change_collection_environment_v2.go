@@ -18,12 +18,15 @@ var collectionsChangeCollectionEnvironmentV2Cmd = &cobra.Command{
 }
 
 var collectionsChangeCollectionEnvironmentV2Flags struct {
-	collectionName string
-	newEnvironment string
-	body           string
+	xOrganizationId string
+	collectionName  string
+	newEnvironment  string
+	body            string
 }
 
 func init() {
+	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	collectionsChangeCollectionEnvironmentV2Cmd.MarkFlagRequired("x-organization-id")
 	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.collectionName, "collection-name", "", "Name of the collection to move")
 	collectionsChangeCollectionEnvironmentV2Cmd.MarkFlagRequired("collection-name")
 	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.newEnvironment, "new-environment", "", "The target environment to move the collection to")
@@ -44,6 +47,13 @@ func runCollectionsChangeCollectionEnvironmentV2(cmd *cobra.Command, args []stri
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -144,6 +154,9 @@ func runCollectionsChangeCollectionEnvironmentV2(cmd *cobra.Command, args []stri
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", collectionsChangeCollectionEnvironmentV2Flags.xOrganizationId)
+	}
 
 	// Request body
 	bodyMap := map[string]any{}

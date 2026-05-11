@@ -18,11 +18,14 @@ var collectionsListCollectionsV2Cmd = &cobra.Command{
 }
 
 var collectionsListCollectionsV2Flags struct {
-	limit  int
-	offset int
+	xOrganizationId string
+	limit           int
+	offset          int
 }
 
 func init() {
+	collectionsListCollectionsV2Cmd.Flags().StringVar(&collectionsListCollectionsV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	collectionsListCollectionsV2Cmd.MarkFlagRequired("x-organization-id")
 	collectionsListCollectionsV2Cmd.Flags().IntVar(&collectionsListCollectionsV2Flags.limit, "limit", 0, "Maximum number of collections to return")
 	collectionsListCollectionsV2Cmd.Flags().IntVar(&collectionsListCollectionsV2Flags.offset, "offset", 0, "Pagination offset")
 
@@ -40,6 +43,13 @@ func runCollectionsListCollectionsV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "limit",
 			Type:        "integer",
@@ -130,6 +140,9 @@ func runCollectionsListCollectionsV2(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", collectionsListCollectionsV2Flags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

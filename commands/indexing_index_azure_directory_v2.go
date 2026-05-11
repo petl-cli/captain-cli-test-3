@@ -18,12 +18,15 @@ var indexingIndexAzureDirectoryV2Cmd = &cobra.Command{
 }
 
 var indexingIndexAzureDirectoryV2Flags struct {
-	collectionName string
-	idempotencyKey string
-	body           string
+	xOrganizationId string
+	collectionName  string
+	idempotencyKey  string
+	body            string
 }
 
 func init() {
+	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	indexingIndexAzureDirectoryV2Cmd.MarkFlagRequired("x-organization-id")
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexAzureDirectoryV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
@@ -43,6 +46,13 @@ func runIndexingIndexAzureDirectoryV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -128,6 +138,9 @@ func runIndexingIndexAzureDirectoryV2(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", indexingIndexAzureDirectoryV2Flags.xOrganizationId)
+	}
 	if cmd.Flags().Changed("idempotency-key") {
 		req.Headers["Idempotency-Key"] = fmt.Sprintf("%v", indexingIndexAzureDirectoryV2Flags.idempotencyKey)
 	}

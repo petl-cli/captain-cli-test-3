@@ -18,9 +18,12 @@ var sandboxDataFundamentalsSandboxCmd = &cobra.Command{
 }
 
 var sandboxDataFundamentalsSandboxFlags struct {
+	xOrganizationId string
 }
 
 func init() {
+	sandboxDataFundamentalsSandboxCmd.Flags().StringVar(&sandboxDataFundamentalsSandboxFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	sandboxDataFundamentalsSandboxCmd.MarkFlagRequired("x-organization-id")
 
 	sandboxDataCmd.AddCommand(sandboxDataFundamentalsSandboxCmd)
 }
@@ -36,6 +39,13 @@ func runSandboxDataFundamentalsSandbox(cmd *cobra.Command, args []string) error 
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 
 		type responseSchema struct {
 			Status      string `json:"status"`
@@ -111,6 +121,9 @@ func runSandboxDataFundamentalsSandbox(cmd *cobra.Command, args []string) error 
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", sandboxDataFundamentalsSandboxFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

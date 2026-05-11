@@ -18,12 +18,15 @@ var investorsActiveInvestmentsCmd = &cobra.Command{
 }
 
 var investorsActiveInvestmentsFlags struct {
-	id       string
-	page     int
-	pageSize int
+	xOrganizationId string
+	id              string
+	page            int
+	pageSize        int
 }
 
 func init() {
+	investorsActiveInvestmentsCmd.Flags().StringVar(&investorsActiveInvestmentsFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	investorsActiveInvestmentsCmd.MarkFlagRequired("x-organization-id")
 	investorsActiveInvestmentsCmd.Flags().StringVar(&investorsActiveInvestmentsFlags.id, "id", "", "Investor name (e.g., 'Sequoia Capital') or entity ID from /investors/search")
 	investorsActiveInvestmentsCmd.MarkFlagRequired("id")
 	investorsActiveInvestmentsCmd.Flags().IntVar(&investorsActiveInvestmentsFlags.page, "page", 0, "Page number for pagination (default: 1)")
@@ -43,6 +46,13 @@ func runInvestorsActiveInvestments(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "id",
 			Type:        "string",
@@ -151,6 +161,9 @@ func runInvestorsActiveInvestments(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", investorsActiveInvestmentsFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

@@ -18,11 +18,14 @@ var datasetsGetDatasetArticleCmd = &cobra.Command{
 }
 
 var datasetsGetDatasetArticleFlags struct {
-	dataset string
-	url     string
+	xOrganizationId string
+	dataset         string
+	url             string
 }
 
 func init() {
+	datasetsGetDatasetArticleCmd.Flags().StringVar(&datasetsGetDatasetArticleFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	datasetsGetDatasetArticleCmd.MarkFlagRequired("x-organization-id")
 	datasetsGetDatasetArticleCmd.Flags().StringVar(&datasetsGetDatasetArticleFlags.dataset, "dataset", "", "The dataset to get articles from. Contact your Account Executive for available datasets.")
 	datasetsGetDatasetArticleCmd.MarkFlagRequired("dataset")
 	datasetsGetDatasetArticleCmd.Flags().StringVar(&datasetsGetDatasetArticleFlags.url, "url", "", "Full URL of the article to get, appended to the path. Must match the dataset's domain.")
@@ -42,6 +45,13 @@ func runDatasetsGetDatasetArticle(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "dataset",
 			Type:        "string",
@@ -148,6 +158,9 @@ func runDatasetsGetDatasetArticle(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", datasetsGetDatasetArticleFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

@@ -18,12 +18,15 @@ var limitedPartnersLpsSearchCmd = &cobra.Command{
 }
 
 var limitedPartnersLpsSearchFlags struct {
-	q      string
-	lpType string
-	limit  int
+	xOrganizationId string
+	q               string
+	lpType          string
+	limit           int
 }
 
 func init() {
+	limitedPartnersLpsSearchCmd.Flags().StringVar(&limitedPartnersLpsSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	limitedPartnersLpsSearchCmd.MarkFlagRequired("x-organization-id")
 	limitedPartnersLpsSearchCmd.Flags().StringVar(&limitedPartnersLpsSearchFlags.q, "q", "", "LP name or keyword (e.g., 'CalPERS')")
 	limitedPartnersLpsSearchCmd.MarkFlagRequired("q")
 	limitedPartnersLpsSearchCmd.Flags().StringVar(&limitedPartnersLpsSearchFlags.lpType, "lp-type", "", "Filter by LP type (e.g., 'pension_fund', 'endowment', 'family_office', 'sovereign_wealth', 'insurance')")
@@ -43,6 +46,13 @@ func runLimitedPartnersLpsSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -148,6 +158,9 @@ func runLimitedPartnersLpsSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", limitedPartnersLpsSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

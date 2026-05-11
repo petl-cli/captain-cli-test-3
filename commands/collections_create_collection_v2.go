@@ -18,12 +18,15 @@ var collectionsCreateCollectionV2Cmd = &cobra.Command{
 }
 
 var collectionsCreateCollectionV2Flags struct {
-	collectionName string
-	description    string
-	body           string
+	xOrganizationId string
+	collectionName  string
+	description     string
+	body            string
 }
 
 func init() {
+	collectionsCreateCollectionV2Cmd.Flags().StringVar(&collectionsCreateCollectionV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	collectionsCreateCollectionV2Cmd.MarkFlagRequired("x-organization-id")
 	collectionsCreateCollectionV2Cmd.Flags().StringVar(&collectionsCreateCollectionV2Flags.collectionName, "collection-name", "", "Name of the collection to create")
 	collectionsCreateCollectionV2Cmd.MarkFlagRequired("collection-name")
 	collectionsCreateCollectionV2Cmd.Flags().StringVar(&collectionsCreateCollectionV2Flags.description, "description", "", "")
@@ -44,6 +47,13 @@ func runCollectionsCreateCollectionV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -134,6 +144,9 @@ func runCollectionsCreateCollectionV2(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", collectionsCreateCollectionV2Flags.xOrganizationId)
+	}
 
 	// Request body
 	bodyMap := map[string]any{}

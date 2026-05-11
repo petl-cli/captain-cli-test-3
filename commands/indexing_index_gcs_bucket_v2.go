@@ -18,11 +18,14 @@ var indexingIndexGcsBucketV2Cmd = &cobra.Command{
 }
 
 var indexingIndexGcsBucketV2Flags struct {
-	collectionName string
-	body           string
+	xOrganizationId string
+	collectionName  string
+	body            string
 }
 
 func init() {
+	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	indexingIndexGcsBucketV2Cmd.MarkFlagRequired("x-organization-id")
 	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexGcsBucketV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
@@ -41,6 +44,13 @@ func runIndexingIndexGcsBucketV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -119,6 +129,9 @@ func runIndexingIndexGcsBucketV2(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", indexingIndexGcsBucketV2Flags.xOrganizationId)
+	}
 
 	// Request body
 	bodyMap := map[string]any{}

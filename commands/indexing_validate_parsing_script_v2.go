@@ -18,17 +18,17 @@ var indexingValidateParsingScriptV2Cmd = &cobra.Command{
 }
 
 var indexingValidateParsingScriptV2Flags struct {
-	authorization   string
 	xOrganizationId string
+	authorization   string
 	file            string
 	body            string
 }
 
 func init() {
+	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	indexingValidateParsingScriptV2Cmd.MarkFlagRequired("x-organization-id")
 	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.authorization, "authorization", "", "Bearer token - your Captain API key.")
 	indexingValidateParsingScriptV2Cmd.MarkFlagRequired("authorization")
-	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.xOrganizationId, "x-organization-id", "", "Organization UUID.")
-	indexingValidateParsingScriptV2Cmd.MarkFlagRequired("x-organization-id")
 	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.file, "file", "", "The .js parsing script file to validate. Max 1 MB.")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
 	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.body, "body", "", "Full request body as JSON (overrides individual flags)")
@@ -48,18 +48,18 @@ func runIndexingValidateParsingScriptV2(cmd *cobra.Command, args []string) error
 		}
 		var flags []flagSchema
 		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
+		flags = append(flags, flagSchema{
 			Name:        "authorization",
 			Type:        "string",
 			Required:    true,
 			Location:    "header",
 			Description: "Bearer token - your Captain API key.",
-		})
-		flags = append(flags, flagSchema{
-			Name:        "x-organization-id",
-			Type:        "string",
-			Required:    true,
-			Location:    "header",
-			Description: "Organization UUID.",
 		})
 		flags = append(flags, flagSchema{
 			Name:        "file",
@@ -138,11 +138,11 @@ func runIndexingValidateParsingScriptV2(cmd *cobra.Command, args []string) error
 	// Query parameters
 
 	// Header parameters
-	if cmd.Flags().Changed("authorization") {
-		req.Headers["Authorization"] = fmt.Sprintf("%v", indexingValidateParsingScriptV2Flags.authorization)
-	}
 	if cmd.Flags().Changed("x-organization-id") {
 		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", indexingValidateParsingScriptV2Flags.xOrganizationId)
+	}
+	if cmd.Flags().Changed("authorization") {
+		req.Headers["Authorization"] = fmt.Sprintf("%v", indexingValidateParsingScriptV2Flags.authorization)
 	}
 
 	// Request body

@@ -18,12 +18,15 @@ var indexingIndexGcsDirectoryV2Cmd = &cobra.Command{
 }
 
 var indexingIndexGcsDirectoryV2Flags struct {
-	collectionName string
-	idempotencyKey string
-	body           string
+	xOrganizationId string
+	collectionName  string
+	idempotencyKey  string
+	body            string
 }
 
 func init() {
+	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	indexingIndexGcsDirectoryV2Cmd.MarkFlagRequired("x-organization-id")
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexGcsDirectoryV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
@@ -43,6 +46,13 @@ func runIndexingIndexGcsDirectoryV2(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "collection-name",
 			Type:        "string",
@@ -128,6 +138,9 @@ func runIndexingIndexGcsDirectoryV2(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", indexingIndexGcsDirectoryV2Flags.xOrganizationId)
+	}
 	if cmd.Flags().Changed("idempotency-key") {
 		req.Headers["Idempotency-Key"] = fmt.Sprintf("%v", indexingIndexGcsDirectoryV2Flags.idempotencyKey)
 	}

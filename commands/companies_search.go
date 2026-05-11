@@ -18,11 +18,14 @@ var companiesSearchCmd = &cobra.Command{
 }
 
 var companiesSearchFlags struct {
-	q     string
-	limit int
+	xOrganizationId string
+	q               string
+	limit           int
 }
 
 func init() {
+	companiesSearchCmd.Flags().StringVar(&companiesSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	companiesSearchCmd.MarkFlagRequired("x-organization-id")
 	companiesSearchCmd.Flags().StringVar(&companiesSearchFlags.q, "q", "", "Company name, domain, or natural language query (e.g. 'AI startups in San Francisco raising Series B')")
 	companiesSearchCmd.MarkFlagRequired("q")
 	companiesSearchCmd.Flags().IntVar(&companiesSearchFlags.limit, "limit", 0, "Maximum results (default 5)")
@@ -41,6 +44,13 @@ func runCompaniesSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -136,6 +146,9 @@ func runCompaniesSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", companiesSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

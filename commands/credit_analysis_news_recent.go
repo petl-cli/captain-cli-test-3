@@ -18,10 +18,13 @@ var creditAnalysisNewsRecentCmd = &cobra.Command{
 }
 
 var creditAnalysisNewsRecentFlags struct {
-	limit int
+	xOrganizationId string
+	limit           int
 }
 
 func init() {
+	creditAnalysisNewsRecentCmd.Flags().StringVar(&creditAnalysisNewsRecentFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisNewsRecentCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisNewsRecentCmd.Flags().IntVar(&creditAnalysisNewsRecentFlags.limit, "limit", 0, "Maximum number of results to return (1�100, default: 20)")
 
 	creditAnalysisCmd.AddCommand(creditAnalysisNewsRecentCmd)
@@ -38,6 +41,13 @@ func runCreditAnalysisNewsRecent(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "limit",
 			Type:        "integer",
@@ -123,6 +133,9 @@ func runCreditAnalysisNewsRecent(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisNewsRecentFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

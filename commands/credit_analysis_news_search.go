@@ -18,15 +18,18 @@ var creditAnalysisNewsSearchCmd = &cobra.Command{
 }
 
 var creditAnalysisNewsSearchFlags struct {
-	q         string
-	category  string
-	regions   string
-	startDate string
-	endDate   string
-	limit     int
+	xOrganizationId string
+	q               string
+	category        string
+	regions         string
+	startDate       string
+	endDate         string
+	limit           int
 }
 
 func init() {
+	creditAnalysisNewsSearchCmd.Flags().StringVar(&creditAnalysisNewsSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisNewsSearchCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisNewsSearchCmd.Flags().StringVar(&creditAnalysisNewsSearchFlags.q, "q", "", "Search query for credit news (e.g., 'Tesla bond issuance')")
 	creditAnalysisNewsSearchCmd.MarkFlagRequired("q")
 	creditAnalysisNewsSearchCmd.Flags().StringVar(&creditAnalysisNewsSearchFlags.category, "category", "", "Filter by news category (e.g., 'bond_issuance', 'rating_change', 'default', 'restructuring')")
@@ -49,6 +52,13 @@ func runCreditAnalysisNewsSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -184,6 +194,9 @@ func runCreditAnalysisNewsSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisNewsSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

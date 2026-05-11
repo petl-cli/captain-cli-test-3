@@ -18,10 +18,13 @@ var dealsStockInfoCmd = &cobra.Command{
 }
 
 var dealsStockInfoFlags struct {
-	id string
+	xOrganizationId string
+	id              string
 }
 
 func init() {
+	dealsStockInfoCmd.Flags().StringVar(&dealsStockInfoFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	dealsStockInfoCmd.MarkFlagRequired("x-organization-id")
 	dealsStockInfoCmd.Flags().StringVar(&dealsStockInfoFlags.id, "id", "", "Deal entity ID")
 	dealsStockInfoCmd.MarkFlagRequired("id")
 
@@ -39,6 +42,13 @@ func runDealsStockInfo(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "id",
 			Type:        "string",
@@ -132,6 +142,9 @@ func runDealsStockInfo(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", dealsStockInfoFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

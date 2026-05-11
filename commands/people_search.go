@@ -18,15 +18,18 @@ var peopleSearchCmd = &cobra.Command{
 }
 
 var peopleSearchFlags struct {
-	q        string
-	company  string
-	title    string
-	location string
-	limit    int
-	offset   int
+	xOrganizationId string
+	q               string
+	company         string
+	title           string
+	location        string
+	limit           int
+	offset          int
 }
 
 func init() {
+	peopleSearchCmd.Flags().StringVar(&peopleSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	peopleSearchCmd.MarkFlagRequired("x-organization-id")
 	peopleSearchCmd.Flags().StringVar(&peopleSearchFlags.q, "q", "", "Person name or search query")
 	peopleSearchCmd.MarkFlagRequired("q")
 	peopleSearchCmd.Flags().StringVar(&peopleSearchFlags.company, "company", "", "Filter by current company")
@@ -49,6 +52,13 @@ func runPeopleSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -184,6 +194,9 @@ func runPeopleSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", peopleSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

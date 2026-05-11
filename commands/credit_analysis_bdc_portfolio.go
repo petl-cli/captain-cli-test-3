@@ -18,12 +18,15 @@ var creditAnalysisBdcPortfolioCmd = &cobra.Command{
 }
 
 var creditAnalysisBdcPortfolioFlags struct {
-	ticker  string
-	quarter string
-	limit   int
+	xOrganizationId string
+	ticker          string
+	quarter         string
+	limit           int
 }
 
 func init() {
+	creditAnalysisBdcPortfolioCmd.Flags().StringVar(&creditAnalysisBdcPortfolioFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisBdcPortfolioCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisBdcPortfolioCmd.Flags().StringVar(&creditAnalysisBdcPortfolioFlags.ticker, "ticker", "", "BDC ticker symbol (e.g., ARCC, BXSL, FSK)")
 	creditAnalysisBdcPortfolioCmd.MarkFlagRequired("ticker")
 	creditAnalysisBdcPortfolioCmd.Flags().StringVar(&creditAnalysisBdcPortfolioFlags.quarter, "quarter", "", "Quarter like '2025-Q1'  -  defaults to latest filing")
@@ -43,6 +46,13 @@ func runCreditAnalysisBdcPortfolio(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "ticker",
 			Type:        "string",
@@ -141,6 +151,9 @@ func runCreditAnalysisBdcPortfolio(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisBdcPortfolioFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

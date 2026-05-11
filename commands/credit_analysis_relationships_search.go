@@ -18,11 +18,14 @@ var creditAnalysisRelationshipsSearchCmd = &cobra.Command{
 }
 
 var creditAnalysisRelationshipsSearchFlags struct {
-	lender   string
-	borrower string
+	xOrganizationId string
+	lender          string
+	borrower        string
 }
 
 func init() {
+	creditAnalysisRelationshipsSearchCmd.Flags().StringVar(&creditAnalysisRelationshipsSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisRelationshipsSearchCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisRelationshipsSearchCmd.Flags().StringVar(&creditAnalysisRelationshipsSearchFlags.lender, "lender", "", "Lender name  -  find their borrowers")
 	creditAnalysisRelationshipsSearchCmd.Flags().StringVar(&creditAnalysisRelationshipsSearchFlags.borrower, "borrower", "", "Borrower name  -  find their lenders")
 
@@ -40,6 +43,13 @@ func runCreditAnalysisRelationshipsSearch(cmd *cobra.Command, args []string) err
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "lender",
 			Type:        "string",
@@ -130,6 +140,9 @@ func runCreditAnalysisRelationshipsSearch(cmd *cobra.Command, args []string) err
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisRelationshipsSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

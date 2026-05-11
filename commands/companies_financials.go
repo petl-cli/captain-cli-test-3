@@ -18,11 +18,14 @@ var companiesFinancialsCmd = &cobra.Command{
 }
 
 var companiesFinancialsFlags struct {
-	companyId  string
-	fiscalYear int
+	xOrganizationId string
+	companyId       string
+	fiscalYear      int
 }
 
 func init() {
+	companiesFinancialsCmd.Flags().StringVar(&companiesFinancialsFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	companiesFinancialsCmd.MarkFlagRequired("x-organization-id")
 	companiesFinancialsCmd.Flags().StringVar(&companiesFinancialsFlags.companyId, "company-id", "", "Company entity ID, website domain, or company name (e.g., 'openai.com', 'OpenAI', or UUID)")
 	companiesFinancialsCmd.MarkFlagRequired("company-id")
 	companiesFinancialsCmd.Flags().IntVar(&companiesFinancialsFlags.fiscalYear, "fiscal-year", 0, "Fiscal year (default: most recent)")
@@ -41,6 +44,13 @@ func runCompaniesFinancials(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "company-id",
 			Type:        "string",
@@ -139,6 +149,9 @@ func runCompaniesFinancials(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", companiesFinancialsFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

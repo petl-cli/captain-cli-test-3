@@ -18,10 +18,13 @@ var creditAnalysisNportFundFilingsCmd = &cobra.Command{
 }
 
 var creditAnalysisNportFundFilingsFlags struct {
-	ticker string
+	xOrganizationId string
+	ticker          string
 }
 
 func init() {
+	creditAnalysisNportFundFilingsCmd.Flags().StringVar(&creditAnalysisNportFundFilingsFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	creditAnalysisNportFundFilingsCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisNportFundFilingsCmd.Flags().StringVar(&creditAnalysisNportFundFilingsFlags.ticker, "ticker", "", "Fund ticker (e.g., CCLFX, AFT)")
 	creditAnalysisNportFundFilingsCmd.MarkFlagRequired("ticker")
 
@@ -39,6 +42,13 @@ func runCreditAnalysisNportFundFilings(cmd *cobra.Command, args []string) error 
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "ticker",
 			Type:        "string",
@@ -117,6 +127,9 @@ func runCreditAnalysisNportFundFilings(cmd *cobra.Command, args []string) error 
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", creditAnalysisNportFundFilingsFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

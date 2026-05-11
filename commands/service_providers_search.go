@@ -18,12 +18,15 @@ var serviceProvidersSearchCmd = &cobra.Command{
 }
 
 var serviceProvidersSearchFlags struct {
-	q            string
-	limit        int
-	providerType string
+	xOrganizationId string
+	q               string
+	limit           int
+	providerType    string
 }
 
 func init() {
+	serviceProvidersSearchCmd.Flags().StringVar(&serviceProvidersSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	serviceProvidersSearchCmd.MarkFlagRequired("x-organization-id")
 	serviceProvidersSearchCmd.Flags().StringVar(&serviceProvidersSearchFlags.q, "q", "", "Provider name or keyword (e.g., 'Wilson Sonsini')")
 	serviceProvidersSearchCmd.MarkFlagRequired("q")
 	serviceProvidersSearchCmd.Flags().IntVar(&serviceProvidersSearchFlags.limit, "limit", 0, "Maximum number of results to return (1�100, default: 10)")
@@ -43,6 +46,13 @@ func runServiceProvidersSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -148,6 +158,9 @@ func runServiceProvidersSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", serviceProvidersSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

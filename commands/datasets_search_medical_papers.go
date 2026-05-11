@@ -18,15 +18,18 @@ var datasetsSearchMedicalPapersCmd = &cobra.Command{
 }
 
 var datasetsSearchMedicalPapersFlags struct {
-	question      string
-	maxSources    int
-	includeTrials bool
-	recencyYears  string
-	stream        bool
-	body          string
+	xOrganizationId string
+	question        string
+	maxSources      int
+	includeTrials   bool
+	recencyYears    string
+	stream          bool
+	body            string
 }
 
 func init() {
+	datasetsSearchMedicalPapersCmd.Flags().StringVar(&datasetsSearchMedicalPapersFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	datasetsSearchMedicalPapersCmd.MarkFlagRequired("x-organization-id")
 	datasetsSearchMedicalPapersCmd.Flags().StringVar(&datasetsSearchMedicalPapersFlags.question, "question", "", "Natural-language question.")
 	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
 	datasetsSearchMedicalPapersCmd.Flags().IntVar(&datasetsSearchMedicalPapersFlags.maxSources, "max-sources", 0, "Target number of cited sources in the final answer.")
@@ -53,6 +56,13 @@ func runDatasetsSearchMedicalPapers(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "question",
 			Type:        "string",
@@ -178,6 +188,9 @@ func runDatasetsSearchMedicalPapers(cmd *cobra.Command, args []string) error {
 	// Query parameters
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", datasetsSearchMedicalPapersFlags.xOrganizationId)
+	}
 
 	// Request body
 	bodyMap := map[string]any{}

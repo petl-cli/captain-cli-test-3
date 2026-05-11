@@ -18,18 +18,21 @@ var dealsSearchCmd = &cobra.Command{
 }
 
 var dealsSearchFlags struct {
-	q         string
-	company   string
-	dealType  string
-	minAmount float64
-	maxAmount float64
-	startDate string
-	endDate   string
-	page      int
-	pageSize  int
+	xOrganizationId string
+	q               string
+	company         string
+	dealType        string
+	minAmount       float64
+	maxAmount       float64
+	startDate       string
+	endDate         string
+	page            int
+	pageSize        int
 }
 
 func init() {
+	dealsSearchCmd.Flags().StringVar(&dealsSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	dealsSearchCmd.MarkFlagRequired("x-organization-id")
 	dealsSearchCmd.Flags().StringVar(&dealsSearchFlags.q, "q", "", "Company name or deal keyword (e.g., 'OpenAI Series B')")
 	dealsSearchCmd.Flags().StringVar(&dealsSearchFlags.company, "company", "", "Filter by company name or domain (e.g., 'OpenAI')")
 	dealsSearchCmd.Flags().StringVar(&dealsSearchFlags.dealType, "deal-type", "", "Filter by deal type (e.g., 'series_a', 'series_b', 'seed', 'ipo', 'acquisition', 'debt')")
@@ -54,6 +57,13 @@ func runDealsSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -219,6 +229,9 @@ func runDealsSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", dealsSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {

@@ -18,12 +18,15 @@ var patentsSearchCmd = &cobra.Command{
 }
 
 var patentsSearchFlags struct {
-	q        string
-	assignee string
-	limit    int
+	xOrganizationId string
+	q               string
+	assignee        string
+	limit           int
 }
 
 func init() {
+	patentsSearchCmd.Flags().StringVar(&patentsSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
+	patentsSearchCmd.MarkFlagRequired("x-organization-id")
 	patentsSearchCmd.Flags().StringVar(&patentsSearchFlags.q, "q", "", "Patent keyword, assignee, or inventor name")
 	patentsSearchCmd.MarkFlagRequired("q")
 	patentsSearchCmd.Flags().StringVar(&patentsSearchFlags.assignee, "assignee", "", "Filter by assignee (company)")
@@ -43,6 +46,13 @@ func runPatentsSearch(cmd *cobra.Command, args []string) error {
 			Description string `json:"description,omitempty"`
 		}
 		var flags []flagSchema
+		flags = append(flags, flagSchema{
+			Name:        "x-organization-id",
+			Type:        "string",
+			Required:    true,
+			Location:    "header",
+			Description: "The organization ID to scope the request",
+		})
 		flags = append(flags, flagSchema{
 			Name:        "q",
 			Type:        "string",
@@ -148,6 +158,9 @@ func runPatentsSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	// Header parameters
+	if cmd.Flags().Changed("x-organization-id") {
+		req.Headers["X-Organization-ID"] = fmt.Sprintf("%v", patentsSearchFlags.xOrganizationId)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
