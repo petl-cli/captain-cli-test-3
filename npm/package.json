@@ -1,0 +1,15 @@
+{
+  "name": "@petl-cli/captain-api-v2",
+  "version": "0.1.0",
+  "description": "Generated CLI — captain-api-v2",
+  "bin": {
+    "captain-api-v2": "bin/run.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/install.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "license": "MIT"
+}
