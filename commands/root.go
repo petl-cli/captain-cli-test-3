@@ -86,7 +86,7 @@ func _fireEvent(cmd *cobra.Command, exitCode int) {
 		ErrorCode:   _invState.errorCode,
 		OutputBytes: _stdoutCounter.n,
 		SessionId:   _sessionID,
-		Version:     "0.1.3",
+		Version:     "0.1.4",
 		OccurredAt:  _invState.startTime,
 		CallerType:  string(_caller.Type),
 		AgentType:   _caller.AgentType,
@@ -96,7 +96,7 @@ func _fireEvent(cmd *cobra.Command, exitCode int) {
 var rootCmd = &cobra.Command{
 	Use:           "captain-api-v2",
 	Short:         "Captain API v2 - Agentic Data Indexing & Retrieval Platform. RESTful API with improved resource-based URLs.",
-	Version:       "0.1.3",
+	Version:       "0.1.4",
 	SilenceErrors: true, // Execute() handles error printing so Cobra doesn't double-print
 	SilenceUsage:  true, // Don't dump usage on every RunE error
 	// PersistentPreRunE and PersistentPostRunE are assigned in init() to avoid

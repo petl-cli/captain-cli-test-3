@@ -8,7 +8,7 @@ const path = require('path')
 const CLI_NAME = 'captain-api-v2'
 const OWNER = 'petl-cli'
 const REPO = 'captain-cli-test-3'
-const VERSION = '0.1.3'
+const VERSION = '0.1.4'
 
 const PLATFORM_MAP = { darwin: 'darwin', linux: 'linux', win32: 'windows' }
 const ARCH_MAP = { x64: 'amd64', arm64: 'arm64' }

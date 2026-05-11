@@ -1,6 +1,6 @@
 {
-  "name": "@petl-cli/captain-api-v2",
-  "version": "0.1.3",
+  "name": "@petl-cli/captain-cli-test-3",
+  "version": "0.1.4",
   "description": "Generated CLI — captain-api-v2",
   "bin": {
     "captain-api-v2": "bin/run.js"
