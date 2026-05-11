@@ -34,11 +34,11 @@ func init() {
 	indexingIndexYoutubeV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexYoutubeV2Cmd.Flags().StringVar(&indexingIndexYoutubeV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexYoutubeV2Cmd.Flags().StringVar(&indexingIndexYoutubeV2Flags.url, "url", "", "A single YouTube video URL. Supported formats: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/. Provide either 'url' or 'urls', not both.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexYoutubeV2Cmd.Flags().StringSliceVar(&indexingIndexYoutubeV2Flags.urls, "urls", nil, "An array of YouTube video URLs to index (max 20). Provide either 'url' or 'urls', not both.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexYoutubeV2Cmd.Flags().StringSliceVar(&indexingIndexYoutubeV2Flags.languages, "languages", nil, "Preferred transcript languages in priority order (ISO 639-1 codes). Defaults to English. Only specify if you need a non-English transcript (e.g., ['fr', 'de']). Falls back to auto-generated captions if manual transcript unavailable.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexYoutubeV2Cmd.Flags().StringVar(&indexingIndexYoutubeV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexYoutubeV2Cmd)

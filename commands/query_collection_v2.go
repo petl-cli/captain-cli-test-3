@@ -39,21 +39,21 @@ func init() {
 	queryCollectionV2Cmd.MarkFlagRequired("collection-name")
 	queryCollectionV2Cmd.Flags().StringVar(&queryCollectionV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	queryCollectionV2Cmd.Flags().StringVar(&queryCollectionV2Flags.query, "query", "", "The natural language query to search for")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	queryCollectionV2Cmd.Flags().BoolVar(&queryCollectionV2Flags.inference, "inference", false, "Enable LLM-generated answers based on the relevant sections retrieved. When false, returns raw search results.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	queryCollectionV2Cmd.Flags().BoolVar(&queryCollectionV2Flags.stream, "stream", false, "Enable real-time streaming of the response")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	queryCollectionV2Cmd.Flags().IntVar(&queryCollectionV2Flags.topK, "top-k", 0, "Number of results to return. Only valid when inference=false. Not supported when inference=true (the agent controls its own search strategy).")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	queryCollectionV2Cmd.Flags().BoolVar(&queryCollectionV2Flags.rerank, "rerank", false, "Enable reranking for improved relevance ordering. Uses Gemini Flash 2.5 by default, or Voyage AI rerank-2.5 as fallback. Adds ~100-300ms latency.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	queryCollectionV2Cmd.Flags().StringVar(&queryCollectionV2Flags.customPrompt, "custom-prompt", "", "Custom system prompt to override the default RAG prompt when inference=true. Allows customizing how the LLM processes and responds to the query with the retrieved context.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	queryCollectionV2Cmd.Flags().BoolVar(&queryCollectionV2Flags.includeBbox, "include-bbox", false, "Include normalized bounding box layout data for each search result. Returns element-level positions (titles, paragraphs, tables, figures, form fields) with page coordinates for PDF and DOCX files. Only supported with inference=false.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	queryCollectionV2Cmd.Flags().BoolVar(&queryCollectionV2Flags.searchResults, "search-results", false, "When inference=true, include the raw search result chunks that were used as context for the LLM response. Defaults to false. Always true when inference=false.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	queryCollectionV2Cmd.Flags().StringVar(&queryCollectionV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	queryCmd.AddCommand(queryCollectionV2Cmd)

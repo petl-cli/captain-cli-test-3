@@ -40,23 +40,23 @@ func init() {
 	indexingIndexR2BucketV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.bucketName, "bucket-name", "", "Name of the R2 bucket")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.accountId, "account-id", "", "Cloudflare account ID (found in your R2 dashboard URL)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.accessKeyId, "access-key-id", "", "R2 S3 API token Access Key ID")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.secretAccessKey, "secret-access-key", "", "R2 S3 API token Secret Access Key")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.jurisdiction, "jurisdiction", "", "R2 jurisdiction. 'default' for global, 'eu' for EU-only storage, 'fedramp' for FedRAMP-compliant storage.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().IntVar(&indexingIndexR2BucketV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().BoolVar(&indexingIndexR2BucketV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2BucketV2Cmd.Flags().StringVar(&indexingIndexR2BucketV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexR2BucketV2Cmd)

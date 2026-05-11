@@ -38,19 +38,19 @@ func init() {
 	indexingIndexGcsDirectoryV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.bucketName, "bucket-name", "", "Name of the GCS bucket")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.directoryPath, "directory-path", "", "Path to the directory within the bucket. Accepts either a relative path (e.g., 'reports/2024/january') or a full GCS URI (e.g., 'gs://my-bucket/reports/2024/january'). All files within this directory and its subdirectories will be indexed.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.serviceAccountJson, "service-account-json", "", "GCP service account JSON key with read access to the bucket")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsDirectoryV2Cmd.Flags().IntVar(&indexingIndexGcsDirectoryV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsDirectoryV2Cmd.Flags().BoolVar(&indexingIndexGcsDirectoryV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsDirectoryV2Cmd.Flags().StringVar(&indexingIndexGcsDirectoryV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexGcsDirectoryV2Cmd)

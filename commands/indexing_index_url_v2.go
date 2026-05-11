@@ -35,13 +35,13 @@ func init() {
 	indexingIndexUrlV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.url, "url", "", "A single public URL to a document or web page. Hosted files (PDF, DOCX, etc.) are indexed directly. Web pages (HTML) are automatically scraped  -  text and images are extracted. Provide either 'url' or 'urls', not both.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexUrlV2Cmd.Flags().StringSliceVar(&indexingIndexUrlV2Flags.urls, "urls", nil, "An array of public URLs to documents or web pages. Each URL is auto-detected  -  hosted files are indexed directly, web pages are scraped. Provide either 'url' or 'urls', not both.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.processingType, "processing-type", "", "Processing mode. For hosted documents: 'advanced' enables AI-enhanced extraction for complex layouts, tables, figures, and charts; 'basic' provides standard document processing. For web pages: 'advanced' extracts both text content and page images; 'basic' extracts text content only (faster, lower cost).")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexUrlV2Cmd.Flags().StringVar(&indexingIndexUrlV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexUrlV2Cmd)

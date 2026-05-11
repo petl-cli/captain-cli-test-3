@@ -39,21 +39,21 @@ func init() {
 	indexingIndexAzureDirectoryV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.containerName, "container-name", "", "Name of the Azure Blob Storage container")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.directoryPath, "directory-path", "", "Path to the directory (prefix) within the container. Accepts either a relative path (e.g., 'reports/2024/january') or a full Azure Blob URI (e.g., 'https://account.blob.core.windows.net/container/reports/2024/january'). All blobs within this prefix will be indexed.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.accountName, "account-name", "", "Azure Storage account name")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.accountKey, "account-key", "", "Azure Storage account key (base64-encoded)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexAzureDirectoryV2Cmd.Flags().IntVar(&indexingIndexAzureDirectoryV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexAzureDirectoryV2Cmd.Flags().BoolVar(&indexingIndexAzureDirectoryV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexAzureDirectoryV2Cmd.Flags().StringVar(&indexingIndexAzureDirectoryV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexAzureDirectoryV2Cmd)

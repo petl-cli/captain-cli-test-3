@@ -24,7 +24,6 @@ var indexingIndexFileV2Flags struct {
 	files           []string
 	processingType  string
 	customMetadata  string
-	body            string
 }
 
 func init() {
@@ -34,12 +33,11 @@ func init() {
 	indexingIndexFileV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexFileV2Cmd.Flags().StringVar(&indexingIndexFileV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexFileV2Cmd.Flags().StringSliceVar(&indexingIndexFileV2Flags.files, "files", nil, "One or more files to upload and index (max 20)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	indexingIndexFileV2Cmd.MarkFlagRequired("files")
 	indexingIndexFileV2Cmd.Flags().StringVar(&indexingIndexFileV2Flags.processingType, "processing-type", "", "Document processing type: 'advanced' for AI-enhanced extraction, 'basic' for standard processing")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexFileV2Cmd.Flags().StringVar(&indexingIndexFileV2Flags.customMetadata, "custom-metadata", "", "JSON string of custom metadata to attach to all indexed chunks")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
-	indexingIndexFileV2Cmd.Flags().StringVar(&indexingIndexFileV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 
 	indexingCmd.AddCommand(indexingIndexFileV2Cmd)
 }
@@ -175,32 +173,22 @@ func runIndexingIndexFileV2(cmd *cobra.Command, args []string) error {
 		req.Headers["Idempotency-Key"] = fmt.Sprintf("%v", indexingIndexFileV2Flags.idempotencyKey)
 	}
 
-	// Request body
-	bodyMap := map[string]any{}
-	if indexingIndexFileV2Flags.body != "" {
-		if err := json.Unmarshal([]byte(indexingIndexFileV2Flags.body), &bodyMap); err != nil {
-			_invState.errorType = "parse_error"
-			cliErr := &output.CLIError{
-				Error:    true,
-				Code:     "validation_error",
-				Message:  fmt.Sprintf("invalid JSON in --body: %v", err),
-				ExitCode: output.ExitValidation,
-			}
-			cliErr.Write(os.Stderr)
-			return output.NewExitError(cliErr)
-		}
+	// Request body — multipart/form-data. File-marked fields go into Files;
+	// remaining scalar fields go into Fields as text parts.
+	multipart := &httpclient.MultipartBody{
+		Files:  map[string][]string{},
+		Fields: map[string]string{},
 	}
-	// Individual flags overlay onto body (flags take precedence over --body JSON)
 	if cmd.Flags().Changed("files") {
-		bodyMap["files"] = indexingIndexFileV2Flags.files
+		multipart.Files["files"] = indexingIndexFileV2Flags.files
 	}
 	if cmd.Flags().Changed("processing-type") {
-		bodyMap["processing_type"] = indexingIndexFileV2Flags.processingType
+		multipart.Fields["processing_type"] = fmt.Sprintf("%v", indexingIndexFileV2Flags.processingType)
 	}
 	if cmd.Flags().Changed("custom-metadata") {
-		bodyMap["custom_metadata"] = indexingIndexFileV2Flags.customMetadata
+		multipart.Fields["custom_metadata"] = fmt.Sprintf("%v", indexingIndexFileV2Flags.customMetadata)
 	}
-	req.Body = bodyMap
+	req.Multipart = multipart
 
 	resp, err := client.Do(req)
 	if err != nil {

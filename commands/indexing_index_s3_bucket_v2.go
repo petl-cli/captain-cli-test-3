@@ -39,21 +39,21 @@ func init() {
 	indexingIndexS3BucketV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.bucketName, "bucket-name", "", "Name of the S3 bucket")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.bucketRegion, "bucket-region", "", "AWS region where the bucket is located")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.awsAccessKeyId, "aws-access-key-id", "", "AWS access key ID with read access to the bucket. Use this for long-lived IAM-user credentials. Omit when using the role-based 'auth' block.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.awsSecretAccessKey, "aws-secret-access-key", "", "AWS secret access key. Use this for long-lived IAM-user credentials. Omit when using the role-based 'auth' block.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexS3BucketV2Cmd.Flags().IntVar(&indexingIndexS3BucketV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexS3BucketV2Cmd.Flags().BoolVar(&indexingIndexS3BucketV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexS3BucketV2Cmd.Flags().StringVar(&indexingIndexS3BucketV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexS3BucketV2Cmd)

@@ -30,13 +30,13 @@ func init() {
 	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
 	datasetsBatchSearchCmd.MarkFlagRequired("x-organization-id")
 	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.q, "q", "", "Search query")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsBatchSearchCmd.Flags().StringSliceVar(&datasetsBatchSearchFlags.datasets, "datasets", nil, "List of dataset names to search. Defaults to all datasets if not provided.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsBatchSearchCmd.Flags().IntVar(&datasetsBatchSearchFlags.limit, "limit", 0, "Maximum number of results to return (default: 10, max: 100)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.author, "author", "", "Filter results by author/byline name. Used as an AND condition with `q`  -  returns only articles matching BOTH the query topic AND the specified author. For all articles by an author regardless of topic, use a broad query like `q=*` with `author`.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsBatchSearchCmd.Flags().StringVar(&datasetsBatchSearchFlags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	datasetsCmd.AddCommand(datasetsBatchSearchCmd)

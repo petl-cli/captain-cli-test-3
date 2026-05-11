@@ -41,25 +41,25 @@ func init() {
 	indexingIndexR2DirectoryV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.bucketName, "bucket-name", "", "Name of the R2 bucket")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.directoryPath, "directory-path", "", "Path to the directory (prefix) within the bucket. Accepts either a relative path (e.g., 'reports/2024/january') or a full R2 URI (e.g., 'r2://my-bucket/reports/2024/january'). All objects within this prefix will be indexed.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.accountId, "account-id", "", "Cloudflare account ID (found in your R2 dashboard URL)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.accessKeyId, "access-key-id", "", "R2 S3 API token Access Key ID")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.secretAccessKey, "secret-access-key", "", "R2 S3 API token Secret Access Key")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.jurisdiction, "jurisdiction", "", "R2 jurisdiction. 'default' for global, 'eu' for EU-only storage, 'fedramp' for FedRAMP-compliant storage.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().IntVar(&indexingIndexR2DirectoryV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().BoolVar(&indexingIndexR2DirectoryV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexR2DirectoryV2Cmd.Flags().StringVar(&indexingIndexR2DirectoryV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexR2DirectoryV2Cmd)

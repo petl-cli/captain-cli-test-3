@@ -48,7 +48,7 @@ The binary is ` + "`" + `captain-api-v2` + "`" + `. Build from source or downloa
 
 - Bearer token — set ` + "`" + `CAPTAIN_API_V2_BEARER_TOKEN` + "`" + ` or pass ` + "`" + `--bearer-token <token>` + "`" + `
 
-Run ` + "`" + `captain-api-v2 configure` + "`" + ` to set credentials interactively.
+Run ` + "`" + `captain-api-v2 configure` + "`" + ` to see how to set credentials.
 
 ## Commands
 

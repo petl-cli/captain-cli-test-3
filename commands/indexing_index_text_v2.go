@@ -33,9 +33,9 @@ func init() {
 	indexingIndexTextV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.idempotencyKey, "idempotency-key", "", "UUID for request deduplication")
 	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.content, "content", "", "The text content to index.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.filename, "filename", "", "Optional filename for the text document. Defaults to 'snippet-{N}.txt' where N auto-increments.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexTextV2Cmd.Flags().StringVar(&indexingIndexTextV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexTextV2Cmd)

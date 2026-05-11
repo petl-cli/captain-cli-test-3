@@ -30,7 +30,7 @@ func init() {
 	collectionsCreateCollectionV2Cmd.Flags().StringVar(&collectionsCreateCollectionV2Flags.collectionName, "collection-name", "", "Name of the collection to create")
 	collectionsCreateCollectionV2Cmd.MarkFlagRequired("collection-name")
 	collectionsCreateCollectionV2Cmd.Flags().StringVar(&collectionsCreateCollectionV2Flags.description, "description", "", "")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	collectionsCreateCollectionV2Cmd.Flags().StringVar(&collectionsCreateCollectionV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	collectionsCmd.AddCommand(collectionsCreateCollectionV2Cmd)

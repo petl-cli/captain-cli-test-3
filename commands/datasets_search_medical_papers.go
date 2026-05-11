@@ -31,15 +31,15 @@ func init() {
 	datasetsSearchMedicalPapersCmd.Flags().StringVar(&datasetsSearchMedicalPapersFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
 	datasetsSearchMedicalPapersCmd.MarkFlagRequired("x-organization-id")
 	datasetsSearchMedicalPapersCmd.Flags().StringVar(&datasetsSearchMedicalPapersFlags.question, "question", "", "Natural-language question.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsSearchMedicalPapersCmd.Flags().IntVar(&datasetsSearchMedicalPapersFlags.maxSources, "max-sources", 0, "Target number of cited sources in the final answer.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsSearchMedicalPapersCmd.Flags().BoolVar(&datasetsSearchMedicalPapersFlags.includeTrials, "include-trials", false, "Whether the agent may call ClinicalTrials.gov.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsSearchMedicalPapersCmd.Flags().StringVar(&datasetsSearchMedicalPapersFlags.recencyYears, "recency-years", "", "Prefer evidence within the last N years where the question allows.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsSearchMedicalPapersCmd.Flags().BoolVar(&datasetsSearchMedicalPapersFlags.stream, "stream", false, "If true, response is text/event-stream; otherwise JSON.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	datasetsSearchMedicalPapersCmd.Flags().StringVar(&datasetsSearchMedicalPapersFlags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	datasetsCmd.AddCommand(datasetsSearchMedicalPapersCmd)

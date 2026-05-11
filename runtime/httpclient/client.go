@@ -94,6 +94,11 @@ func New(baseURL string, auth AuthProvider) *Client {
 }
 
 // Request represents a generic API call built from CLI flags.
+//
+// Body and Multipart are mutually exclusive: a command is either JSON-bodied
+// (Body) or multipart-bodied (Multipart). The generator picks one based on
+// the spec's requestBody content type and never sets both. If both happen to
+// be set due to caller error, Multipart wins.
 type Request struct {
 	Method      string
 	Path        string              // Path with params already substituted, e.g. /users/123
@@ -102,6 +107,7 @@ type Request struct {
 	Headers     map[string]string
 	Body        any    // Will be JSON-serialized; nil means no body
 	ContentType string // Defaults to "application/json" when Body is non-nil
+	Multipart   *MultipartBody // Set instead of Body for multipart/form-data uploads
 }
 
 // Response wraps the HTTP response with parsed metadata.
@@ -232,14 +238,29 @@ func (c *Client) buildHTTPRequest(req *Request) (*http.Request, error) {
 	}
 	u.RawQuery = q.Encode()
 
-	// Serialize body
+	// Serialize body. Multipart and JSON are mutually exclusive — the generator
+	// emits exactly one path per command. We branch once here and never mix.
 	var bodyReader io.Reader
-	if req.Body != nil {
+	var resolvedContentType string
+
+	switch {
+	case !req.Multipart.IsEmpty():
+		mr, ct, err := buildMultipartBody(req.Multipart)
+		if err != nil {
+			return nil, fmt.Errorf("serializing multipart body: %w", err)
+		}
+		bodyReader = mr
+		resolvedContentType = ct
+	case req.Body != nil:
 		data, err := json.Marshal(req.Body)
 		if err != nil {
 			return nil, fmt.Errorf("serializing body: %w", err)
 		}
 		bodyReader = bytes.NewReader(data)
+		resolvedContentType = req.ContentType
+		if resolvedContentType == "" {
+			resolvedContentType = "application/json"
+		}
 	}
 
 	httpReq, err := http.NewRequest(req.Method, u.String(), bodyReader)
@@ -247,13 +268,8 @@ func (c *Client) buildHTTPRequest(req *Request) (*http.Request, error) {
 		return nil, err
 	}
 
-	// Content-Type
-	if req.Body != nil {
-		ct := req.ContentType
-		if ct == "" {
-			ct = "application/json"
-		}
-		httpReq.Header.Set("Content-Type", ct)
+	if resolvedContentType != "" {
+		httpReq.Header.Set("Content-Type", resolvedContentType)
 	}
 
 	// Client-level headers
@@ -275,8 +291,24 @@ func (c *Client) buildHTTPRequest(req *Request) (*http.Request, error) {
 
 // dryRun returns a synthetic response describing what would be sent without
 // making any network call. Sensitive headers are redacted.
+//
+// Multipart dry-runs intentionally do not open the referenced files. Users
+// often run --dry-run while iterating on flag values before the files exist,
+// and failing on missing files would defeat the purpose. We surface the
+// {field → [paths]} mapping instead so the user can confirm shape and let
+// the server-side validation surface real upload errors on the live call.
 func (c *Client) dryRun(req *Request) (*Response, error) {
-	httpReq, err := c.buildHTTPRequest(req)
+	// For multipart, build a stub request so headers/url/query are correct
+	// but skip the actual body construction (which would open files).
+	multipartMode := !req.Multipart.IsEmpty()
+	dryReq := req
+	if multipartMode {
+		stub := *req
+		stub.Multipart = nil
+		dryReq = &stub
+	}
+
+	httpReq, err := c.buildHTTPRequest(dryReq)
 	if err != nil {
 		return nil, fmt.Errorf("building request (dry-run): %w", err)
 	}
@@ -286,17 +318,23 @@ func (c *Client) dryRun(req *Request) (*Response, error) {
 		redactedHeaders[k] = redactHeader(k, httpReq.Header.Get(k))
 	}
 
-	payload := map[string]any{
-		"dry_run": true,
-		"request": map[string]any{
-			"method":  httpReq.Method,
-			"url":     httpReq.URL.String(),
-			"headers": redactedHeaders,
-			"body":    req.Body,
-		},
+	requestPayload := map[string]any{
+		"method":  httpReq.Method,
+		"url":     httpReq.URL.String(),
+		"headers": redactedHeaders,
+	}
+	if multipartMode {
+		requestPayload["content_type"] = "multipart/form-data"
+		requestPayload["files"] = req.Multipart.Files
+		requestPayload["fields"] = req.Multipart.Fields
+	} else {
+		requestPayload["body"] = req.Body
 	}
 
-	data, _ := json.MarshalIndent(payload, "", "  ")
+	data, _ := json.MarshalIndent(map[string]any{
+		"dry_run": true,
+		"request": requestPayload,
+	}, "", "  ")
 	return &Response{
 		StatusCode: 0,
 		Headers:    make(http.Header),

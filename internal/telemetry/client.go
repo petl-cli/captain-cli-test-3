@@ -186,7 +186,7 @@ func (c *Client) send(batch []Event) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.token)
-	req.Header.Set("User-Agent", "captain-api-v2-cli/0.1.4")
+	req.Header.Set("User-Agent", "captain-api-v2-cli/0.1.5")
 
 	resp, err := c.http.Do(req)
 	if err != nil {

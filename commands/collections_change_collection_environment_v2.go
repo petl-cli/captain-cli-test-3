@@ -30,7 +30,7 @@ func init() {
 	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.collectionName, "collection-name", "", "Name of the collection to move")
 	collectionsChangeCollectionEnvironmentV2Cmd.MarkFlagRequired("collection-name")
 	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.newEnvironment, "new-environment", "", "The target environment to move the collection to")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	collectionsChangeCollectionEnvironmentV2Cmd.Flags().StringVar(&collectionsChangeCollectionEnvironmentV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	collectionsCmd.AddCommand(collectionsChangeCollectionEnvironmentV2Cmd)

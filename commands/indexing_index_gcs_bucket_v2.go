@@ -35,17 +35,17 @@ func init() {
 	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.collectionName, "collection-name", "", "Name of the collection to index into")
 	indexingIndexGcsBucketV2Cmd.MarkFlagRequired("collection-name")
 	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.bucketName, "bucket-name", "", "Name of the GCS bucket")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.serviceAccountJson, "service-account-json", "", "GCP service account JSON key with read access to the bucket")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.processingType, "processing-type", "", "Document processing type. 'advanced' uses agentic OCR with AI-enhanced extraction for complex layouts, tables, figures, charts, and documents containing images. 'basic' provides reliable OCR optimized for general document indexing and high-volume processing.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsBucketV2Cmd.Flags().IntVar(&indexingIndexGcsBucketV2Flags.maxFiles, "max-files", 0, "Maximum number of files to index (optional)")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsBucketV2Cmd.Flags().BoolVar(&indexingIndexGcsBucketV2Flags.skipExisting, "skip-existing", false, "Skip files that are already indexed in the collection. When true, only new files will be indexed. Set to false to re-index all files.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.parsingScript, "parsing-script", "", "Relative path to a JavaScript parsing script for JSON files (e.g. 'research/paper-parser'). When provided, .json files are processed through a sandboxed V8 isolate that executes the script to extract text and metadata. Without this parameter, .json files are indexed as raw text. Scripts are org-scoped and managed in the Parser Studio.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	indexingIndexGcsBucketV2Cmd.Flags().StringVar(&indexingIndexGcsBucketV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	indexingCmd.AddCommand(indexingIndexGcsBucketV2Cmd)

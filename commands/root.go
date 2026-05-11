@@ -86,7 +86,7 @@ func _fireEvent(cmd *cobra.Command, exitCode int) {
 		ErrorCode:   _invState.errorCode,
 		OutputBytes: _stdoutCounter.n,
 		SessionId:   _sessionID,
-		Version:     "0.1.4",
+		Version:     "0.1.5",
 		OccurredAt:  _invState.startTime,
 		CallerType:  string(_caller.Type),
 		AgentType:   _caller.AgentType,
@@ -96,7 +96,7 @@ func _fireEvent(cmd *cobra.Command, exitCode int) {
 var rootCmd = &cobra.Command{
 	Use:           "captain-api-v2",
 	Short:         "Captain API v2 - Agentic Data Indexing & Retrieval Platform. RESTful API with improved resource-based URLs.",
-	Version:       "0.1.4",
+	Version:       "0.1.5",
 	SilenceErrors: true, // Execute() handles error printing so Cobra doesn't double-print
 	SilenceUsage:  true, // Don't dump usage on every RunE error
 	// PersistentPreRunE and PersistentPostRunE are assigned in init() to avoid
@@ -220,12 +220,33 @@ func rootConfig() (*config.Config, error) {
 	return _configLoader.Load(flags)
 }
 
+// stripRequiredFlags walks the command tree and clears Cobra's required-flag
+// annotation. Cobra validates required flags BEFORE RunE runs, so without
+// this step `--schema` is unreachable on any command that has required flags.
+// --schema is pure introspection (no network, no request build), so skipping
+// required-flag enforcement is safe — and necessary for agents to discover
+// command contracts without having to guess valid placeholder values.
+func stripRequiredFlags(cmd *cobra.Command) {
+	cmd.Flags().VisitAll(func(f *pflag.Flag) {
+		delete(f.Annotations, cobra.BashCompOneRequiredFlag)
+	})
+	for _, sub := range cmd.Commands() {
+		stripRequiredFlags(sub)
+	}
+}
+
 // Execute runs the root command. Telemetry is flushed before every os.Exit.
 //
 // For the success path, PersistentPostRunE fires the event. For the error path,
 // Cobra does not call PersistentPostRunE, so we fire it here using the state
 // that PersistentPreRunE captured in _invState before RunE ran.
 func Execute() {
+	for _, a := range os.Args[1:] {
+		if a == "--schema" {
+			stripRequiredFlags(rootCmd)
+			break
+		}
+	}
 	if err := rootCmd.Execute(); err != nil {
 		var exitErr *output.ExitError
 		exitCode := output.ExitErr

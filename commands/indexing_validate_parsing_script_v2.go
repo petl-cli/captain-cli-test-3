@@ -21,7 +21,6 @@ var indexingValidateParsingScriptV2Flags struct {
 	xOrganizationId string
 	authorization   string
 	file            string
-	body            string
 }
 
 func init() {
@@ -30,8 +29,7 @@ func init() {
 	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.authorization, "authorization", "", "Bearer token - your Captain API key.")
 	indexingValidateParsingScriptV2Cmd.MarkFlagRequired("authorization")
 	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.file, "file", "", "The .js parsing script file to validate. Max 1 MB.")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
-	indexingValidateParsingScriptV2Cmd.Flags().StringVar(&indexingValidateParsingScriptV2Flags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
+	indexingValidateParsingScriptV2Cmd.MarkFlagRequired("file")
 
 	indexingCmd.AddCommand(indexingValidateParsingScriptV2Cmd)
 }
@@ -145,26 +143,16 @@ func runIndexingValidateParsingScriptV2(cmd *cobra.Command, args []string) error
 		req.Headers["Authorization"] = fmt.Sprintf("%v", indexingValidateParsingScriptV2Flags.authorization)
 	}
 
-	// Request body
-	bodyMap := map[string]any{}
-	if indexingValidateParsingScriptV2Flags.body != "" {
-		if err := json.Unmarshal([]byte(indexingValidateParsingScriptV2Flags.body), &bodyMap); err != nil {
-			_invState.errorType = "parse_error"
-			cliErr := &output.CLIError{
-				Error:    true,
-				Code:     "validation_error",
-				Message:  fmt.Sprintf("invalid JSON in --body: %v", err),
-				ExitCode: output.ExitValidation,
-			}
-			cliErr.Write(os.Stderr)
-			return output.NewExitError(cliErr)
-		}
+	// Request body — multipart/form-data. File-marked fields go into Files;
+	// remaining scalar fields go into Fields as text parts.
+	multipart := &httpclient.MultipartBody{
+		Files:  map[string][]string{},
+		Fields: map[string]string{},
 	}
-	// Individual flags overlay onto body (flags take precedence over --body JSON)
 	if cmd.Flags().Changed("file") {
-		bodyMap["file"] = indexingValidateParsingScriptV2Flags.file
+		multipart.Files["file"] = []string{indexingValidateParsingScriptV2Flags.file}
 	}
-	req.Body = bodyMap
+	req.Multipart = multipart
 
 	resp, err := client.Do(req)
 	if err != nil {

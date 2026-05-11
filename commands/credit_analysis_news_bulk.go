@@ -27,7 +27,7 @@ func init() {
 	creditAnalysisNewsBulkCmd.Flags().StringVar(&creditAnalysisNewsBulkFlags.xOrganizationId, "x-organization-id", "", "The organization ID to scope the request")
 	creditAnalysisNewsBulkCmd.MarkFlagRequired("x-organization-id")
 	creditAnalysisNewsBulkCmd.Flags().StringSliceVar(&creditAnalysisNewsBulkFlags.queries, "queries", nil, "List of search queries")
-	// Note: body fields are not MarkFlagRequired — --body JSON satisfies them too.
+	// Note: body fields are not MarkFlagRequired in JSON mode — --body satisfies them too.
 	creditAnalysisNewsBulkCmd.Flags().StringVar(&creditAnalysisNewsBulkFlags.body, "body", "", "Full request body as JSON. Individual body flags override matching keys in this JSON.")
 
 	creditAnalysisCmd.AddCommand(creditAnalysisNewsBulkCmd)

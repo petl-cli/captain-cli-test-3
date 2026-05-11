@@ -58,7 +58,7 @@ func runFeedback(cmd *cobra.Command, args []string) error {
 	caller := telemetry.DetectCaller()
 
 	id, err := feedback.Submit(context.Background(), feedbackEndpoint, feedbackToken, feedback.Payload{
-		CLIVersion:     "0.1.4",
+		CLIVersion:     "0.1.5",
 		Message:        message,
 		CommandContext: feedbackFlags.about,
 		AgentType:      caller.AgentType,
